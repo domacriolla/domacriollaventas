@@ -1,1094 +1,2906 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-<base target="_top">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pedidos de Insumos — Doma Criolla</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tablero de Gestión — Doma Criolla</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-  :root{
-    --bg:#F4EDE1;
-    --surface:#FFFDF9;
-    --surface-alt:#F1E5D2;
-    --border:#E1D0B4;
-    --border-strong:#C9AF88;
-    --ink:#311B10;
-    --ink-soft:#6E5645;
-    --ink-faint:#A6907A;
-    --accent:#65341A;
-    --accent-ink:#FFFFFF;
-    --accent-soft:#EFDCBE;
-    --accent-soft-ink:#65341A;
-    --danger:#A83A2C;
-    --danger-soft:#F2DAD3;
-    --danger-ink:#7A2A1F;
-    --success:#4C7A43;
-    --success-soft:#DDEAD4;
-    --success-ink:#345C2C;
-    --pending:#B06B1C;
-    --pending-soft:#F3DFB8;
-    --pending-ink:#7A4B12;
-    --shadow: 0 1px 2px rgba(43,38,33,0.06), 0 4px 14px rgba(43,38,33,0.06);
-    --radius: 10px;
-    color-scheme: light;
-  }
-  @media (prefers-color-scheme: dark){
-    :root{
-      --bg:#1E120A; --surface:#2A1B10; --surface-alt:#332318; --border:#4A3624; --border-strong:#5E4630;
-      --ink:#F3E6D3; --ink-soft:#C7AE93; --ink-faint:#93795F;
-      --accent:#E2954E; --accent-ink:#241604; --accent-soft:#4A3419; --accent-soft-ink:#F3D9AF;
-      --danger:#E08573; --danger-soft:#432421; --danger-ink:#F2C6BC;
-      --success:#8FC183; --success-soft:#25331F; --success-ink:#C7E4BC;
-      --pending:#E0AA5A; --pending-soft:#40300F; --pending-ink:#F2D89F;
-      color-scheme: dark;
-    }
-  }
-  *{box-sizing:border-box;}
-  html,body{ margin:0; background:var(--bg); }
-  body{
-    color:var(--ink);
-    font-family:'Poppins', system-ui, sans-serif;
-    -webkit-font-smoothing:antialiased;
-  }
-  .wrap{ max-width:760px; margin:0 auto; padding:0 16px 80px; }
-  h1,h2,h3{ font-family:'Cinzel','Poppins',serif; margin:0; letter-spacing:.01em; }
-  .mono{ font-family:'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+:root{
+  --M:#341712;--CR:#EDD9C3;--OR:#F68B30;--CH:#37353B;--DK:#1B1117;
+  --BG:#F4EDE4;--WH:#FFFFFF;--GL:#F2EDE8;--GR:#9E9591;--BD:#E0D5CC;
+  --GN:#2E7D32;--T5:#FFF3E0;--UT:#FFFBEC;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--BG);color:var(--CH);font-size:13px}
 
-  header.top{
-    position:sticky; top:0; z-index:20;
-    background:var(--bg);
-    padding:16px 16px 0;
-    border-bottom:1px solid var(--border);
-  }
-  header.top .head-row{
-    max-width:760px; margin:0 auto;
-    display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap;
-    padding-bottom:12px;
-  }
-  header.top h1{ font-size:20px; font-weight:800; letter-spacing:-0.01em; }
-  header.top .sub{ font-size:12.5px; color:var(--ink-soft); margin-top:2px; }
-  header.top .refresh{
-    background:none; border:1px solid var(--border-strong); border-radius:99px;
-    color:var(--ink-soft); font-size:12px; font-weight:600; padding:6px 12px; cursor:pointer;
-    font-family:'Poppins',sans-serif; display:flex; align-items:center; gap:5px;
-  }
-  nav.tabs{ max-width:760px; margin:0 auto; display:flex; gap:4px; overflow-x:auto; scrollbar-width:none; }
-  nav.tabs::-webkit-scrollbar{display:none;}
-  nav.tabs button{
-    appearance:none; border:none; background:none;
-    font-family:'Poppins',sans-serif; font-weight:700; font-size:13.5px;
-    color:var(--ink-soft); padding:10px 12px 12px; cursor:pointer;
-    border-bottom:2.5px solid transparent; white-space:nowrap;
-    display:flex; align-items:center; gap:6px;
-  }
-  nav.tabs button.active{ color:var(--ink); border-bottom-color:var(--accent); }
-  nav.tabs button .count{
-    font-family:'IBM Plex Mono',monospace; font-size:10.5px; font-weight:600;
-    background:var(--pending-soft); color:var(--pending-ink);
-    border-radius:99px; padding:1px 6px; min-width:16px; text-align:center;
-  }
+/* UPLOAD */
+#upl{max-width:740px;margin:44px auto;padding:40px;background:var(--WH);border-radius:16px;box-shadow:0 4px 32px rgba(52,23,18,.13);border-top:6px solid var(--M)}
+.logo{font-size:28px;font-weight:800;color:var(--M);letter-spacing:-.5px}.logo span{color:var(--OR)}
+.sub{color:var(--GR);margin:4px 0 22px;font-size:13px}
+hr.dv{border:none;border-top:1px solid var(--BD);margin:20px 0}
+.slbl{font-size:11px;font-weight:700;color:var(--GR);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+.ug3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;margin-bottom:8px}
+.ug2{display:grid;grid-template-columns:1.8fr 1fr;gap:11px;margin-bottom:8px}
+.dz{border:2px dashed var(--BD);border-radius:10px;padding:18px 10px;text-align:center;cursor:pointer;transition:.2s;position:relative;background:var(--GL)}
+.dz:hover{border-color:var(--OR);background:var(--CR)}.dz.ok{border-color:var(--GN);background:#f0f8f0;border-style:solid}
+.dz .ln{font-size:12px;font-weight:700;color:var(--M);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.dz .ic{font-size:22px;margin-bottom:4px}.dz .ht{font-size:11px;color:var(--GR)}.dz.ok .ht{color:var(--GN);font-weight:600}
+.dz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.inp{width:100%;padding:9px 13px;border:2px solid var(--BD);border-radius:8px;font-size:13px;background:var(--GL);color:var(--CH)}
+.inp:focus{outline:none;border-color:var(--OR);background:var(--WH)}
+.btn-p{width:100%;padding:14px;background:var(--M);color:var(--CR);border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-top:16px;transition:.2s}
+.btn-p:hover:not(:disabled){background:#4a1f18}.btn-p:disabled{opacity:.4;cursor:not-allowed}
+.btn-s{padding:8px 15px;background:transparent;color:var(--M);border:2px solid var(--M);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:.2s}
+.btn-s:hover{background:var(--M);color:var(--CR)}
+.irow{display:flex;gap:10px;align-items:center;margin-top:8px}
+.irow label{font-size:12px;color:var(--GR);flex:1}
+.note{font-size:11px;color:var(--GR);font-style:italic;margin-top:6px}
+.errmsg{color:#c62828;font-size:12px;margin-top:8px;text-align:center;min-height:16px}
 
-  main{ padding-top:18px; }
-  .panel{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:16px; }
-  .panel-head{ padding:14px 16px; border-bottom:1px dashed var(--border-strong); display:flex; align-items:center; justify-content:space-between; gap:10px; }
-  .panel-head h3{ font-size:14.5px; font-weight:700; letter-spacing:.02em; text-transform:uppercase; color:var(--ink-soft); }
-  .panel-body{ padding:14px 16px; }
+/* DASHBOARD */
+#dash{display:none}
+.topbar{background:var(--DK);color:var(--CR);padding:11px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.topbar .br{font-size:16px;font-weight:800}.topbar .br span{color:var(--OR)}
+.topbar .pd{font-size:11px;color:#888;margin-top:2px}
+.tbas{display:flex;gap:7px}
+.btnb{background:transparent;border:1px solid #555;color:#ccc;padding:5px 11px;border-radius:6px;cursor:pointer;font-size:11px;transition:.15s}
+.btnb:hover{border-color:var(--OR);color:var(--OR)}
 
-  label.field{ display:block; margin-bottom:12px; }
-  label.field .lbl{ display:block; font-size:12.5px; font-weight:600; color:var(--ink-soft); margin-bottom:5px; }
-  input[type=text], input[type=password], input[type=date], select, textarea{
-    width:100%; font-family:'Poppins',sans-serif; font-size:15px;
-    padding:10px 11px; border-radius:8px; border:1px solid var(--border-strong);
-    background:var(--surface-alt); color:var(--ink); min-height:42px;
-  }
-  input[type=text]:focus, input[type=password]:focus, input[type=date]:focus, select:focus, textarea:focus{ outline:2px solid var(--accent); outline-offset:1px; }
-  .user-box{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
-  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-  @media (max-width:480px){ .row2{ grid-template-columns:1fr; } }
+.ltabs{background:var(--WH);border-bottom:2px solid var(--BD);display:flex;padding:0 20px;overflow-x:auto;gap:2px;position:sticky;top:51px;z-index:99}
+.ltab{padding:12px 19px;cursor:pointer;font-size:13px;font-weight:600;color:var(--GR);border-bottom:3px solid transparent;white-space:nowrap;margin-bottom:-2px;transition:.15s}
+.ltab:hover{color:var(--CH)}.ltab.active{color:var(--M);border-color:var(--M)}
 
-  .btn{
-    appearance:none; border:none; cursor:pointer;
-    font-family:'Poppins',sans-serif; font-weight:700; font-size:14px;
-    padding:11px 18px; border-radius:8px;
-    display:inline-flex; align-items:center; justify-content:center; gap:6px;
-    min-height:44px;
-  }
-  .btn-primary{ background:var(--accent); color:var(--accent-ink); }
-  .btn-primary:disabled{ opacity:.45; cursor:not-allowed; }
-  .btn-ghost{ background:transparent; color:var(--ink-soft); border:1px solid var(--border-strong); }
-  .btn-sm{ padding:7px 11px; min-height:34px; font-size:12.5px; }
-  .btn-block{ width:100%; }
+.stabs{background:var(--CR);border-bottom:1px solid var(--BD);display:flex;padding:0 20px;overflow-x:auto;gap:1px;position:sticky;top:93px;z-index:98}
+.stab{padding:7px 13px;cursor:pointer;font-size:11px;font-weight:600;color:#8a7060;border-bottom:3px solid transparent;white-space:nowrap;margin-bottom:-1px;transition:.15s}
+.stab:hover{color:var(--M)}.stab.active{color:var(--M);border-color:var(--OR)}
 
-  .cat-block{ border-top:1px dashed var(--border-strong); }
-  .cat-block:first-child{ border-top:none; }
-  .cat-title{ padding:12px 16px 4px; font-size:12.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent-soft-ink); background:var(--accent-soft); }
-  .item-row{ display:flex; align-items:center; gap:10px; padding:8px 16px; border-top:1px solid var(--border); }
-  .item-row:first-of-type{ border-top:none; }
-  .item-name{ flex:1; font-size:14px; line-height:1.3; }
-  .item-name .tag-extra{ font-size:10px; font-weight:700; color:var(--success-ink); background:var(--success-soft); border-radius:4px; padding:1px 5px; margin-left:6px; vertical-align:middle; }
-  input[type=text].qty-input{ width:54px; flex:none; text-align:center; font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:15px; padding:8px 4px; min-height:38px; }
-  .rm-btn{ flex:none; width:30px; height:30px; border-radius:7px; border:1px solid var(--border-strong); background:var(--surface-alt); color:var(--danger); cursor:pointer; font-size:15px; line-height:1; }
+.cnt{padding:18px 22px;max-width:1440px;margin:0 auto}
 
-  .extra-add{ display:flex; gap:8px; padding:10px 16px 14px; }
-  .extra-add input[type=text]{ flex:1; }
-  .extra-add input[type=text].qty-input{ width:54px; }
+/* KPIs */
+.krow{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin-bottom:15px}
+.kpi{background:var(--WH);border-radius:10px;padding:14px 16px;box-shadow:0 1px 4px rgba(52,23,18,.08);border-left:4px solid var(--M)}
+.kpi .lbl{font-size:10px;color:var(--GR);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.kpi .val{font-size:19px;font-weight:800;color:var(--M)}.kpi .val.g{color:var(--GN)}
 
-  .badge{ font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; padding:3px 8px; border-radius:99px; white-space:nowrap; }
-  .badge-pending{ background:var(--pending-soft); color:var(--pending-ink); }
-  .badge-sent{ background:var(--accent-soft); color:var(--accent-soft-ink); }
-  .badge-closed{ background:var(--success-soft); color:var(--success-ink); }
-  .idr-readonly{ font-size:13px; color:var(--ink-soft); padding:2px 0; }
-  .idr-readonly b{ color:var(--ink); font-weight:600; }
+/* Local cards */
+.lrow{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:15px}
+.lcard{background:var(--WH);border-radius:10px;padding:14px 16px;box-shadow:0 1px 4px rgba(52,23,18,.08);border-top:4px solid var(--OR)}
+.lcard .nm{font-size:11px;font-weight:700;color:var(--M);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px}
+.lcard .r{display:flex;justify-content:space-between;margin-bottom:3px;font-size:12px}
+.lcard .r .k{color:var(--GR)}.lcard .r .v{font-weight:700}
 
-  .filters{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; padding:12px 16px; border-bottom:1px solid var(--border); }
-  .filters select{ width:auto; min-height:36px; padding:6px 10px; font-size:13px; }
-  .filters .btn{ margin-left:auto; }
+/* Canal cards */
+.cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:15px}
+.ccard{background:var(--WH);border-radius:10px;padding:14px 16px;box-shadow:0 1px 4px rgba(52,23,18,.08)}
+.ccard .ch{font-size:13px;font-weight:700;color:var(--M);margin-bottom:9px}
+.ccard .cr{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid var(--BD)}
+.ccard .cr:last-child{border:none}.ccard .ck{color:var(--GR)}.ccard .cv{font-weight:700}
 
-  .order-card{ padding:13px 16px; border-top:1px solid var(--border); display:flex; align-items:center; gap:12px; cursor:pointer; }
-  .order-card:first-child{ border-top:none; }
-  .order-card:hover{ background:var(--surface-alt); }
-  .order-card .oc-main{ flex:1; min-width:0; }
-  .order-card .oc-local{ font-family:'Cinzel',serif; font-weight:700; font-size:14.5px; }
-  .order-card .oc-sub{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
-  .order-card .oc-arrow{ color:var(--ink-faint); font-size:16px; }
+/* Sections */
+.sec{background:var(--WH);border-radius:10px;padding:15px 17px;box-shadow:0 1px 4px rgba(52,23,18,.08);margin-bottom:13px}
+.st{font-size:13px;font-weight:700;color:var(--M);margin-bottom:11px;padding-left:9px;border-left:4px solid var(--OR)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:13px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px;margin-bottom:13px}
 
-  .empty{ padding:34px 16px; text-align:center; color:var(--ink-soft); font-size:14px; }
-  .empty .big{ font-size:26px; margin-bottom:6px; }
+/* Tables */
+.tw{overflow-x:auto;overflow-y:auto;max-height:72vh;position:relative}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:7px 9px;background:var(--GL);color:var(--GR);font-weight:700;border-bottom:2px solid var(--BD);white-space:nowrap;font-size:10px;text-transform:uppercase;letter-spacing:.4px;position:sticky;top:0;z-index:2}
+th.r{text-align:right}th.c{text-align:center}
+td{padding:6px 9px;border-bottom:1px solid var(--GL);vertical-align:middle}
+td.r{text-align:right;font-variant-numeric:tabular-nums}td.c{text-align:center}
+tr.dr:hover td{background:#fdf7f2}
+.catr td{background:var(--M);color:var(--CR);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+.subt td{background:var(--GL);font-weight:700;border-top:2px solid var(--BD);color:var(--M)}
+.t5r td{background:var(--T5)}.t5r td:first-child{border-left:3px solid var(--OR)}
+.utr td{background:var(--UT)}.utr td:first-child{border-left:3px solid #FFB300}
+.sc1{position:sticky;left:0;z-index:1;background:var(--WH);}
+.sc2{position:sticky;left:160px;z-index:1;background:var(--WH);}
+th.sc1{left:0;z-index:4;}th.sc2{left:160px;z-index:4;}
+.subt td.sc1,.subt td.sc2{background:var(--GL);}
+tr.dr:hover td.sc1,tr.dr:hover td.sc2{background:#fdf7f2;}
+.rk{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;font-size:10px;font-weight:700;background:var(--GL);color:var(--GR)}
+.rk.t{background:var(--OR);color:#fff}
+.legend{display:flex;gap:14px;font-size:11px;color:var(--GR);margin-top:8px;flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:4px}
+.dot{width:10px;height:10px;border-radius:2px;display:inline-block}
 
-  .toast{
-    position:fixed; left:50%; bottom:22px; transform:translateX(-50%);
-    background:var(--ink); color:var(--bg); font-size:13.5px; font-weight:600;
-    padding:11px 18px; border-radius:99px; box-shadow:var(--shadow);
-    z-index:50; opacity:0; pointer-events:none; transition:opacity .2s, transform .2s;
-  }
-  .toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); }
-
-  .detail-head{ padding:14px 16px; border-bottom:1px dashed var(--border-strong); }
-  .detail-head .back{ background:none; border:none; color:var(--ink-soft); font-family:'Poppins',sans-serif; font-size:13px; cursor:pointer; padding:0 0 10px; display:flex; align-items:center; gap:4px; }
-  .detail-grid{ display:flex; flex-wrap:wrap; gap:8px 18px; font-size:13px; color:var(--ink-soft); }
-  .detail-grid b{ color:var(--ink); font-weight:600; }
-
-  .item-detail-row{ padding:11px 16px; border-top:1px solid var(--border); }
-  .item-detail-row:first-of-type{ border-top:none; }
-  .item-detail-row .idr-top{ display:flex; align-items:center; gap:10px; margin-bottom:8px; }
-  .item-detail-row .idr-name{ flex:1; font-size:14px; }
-  .item-detail-row .idr-pedido{ font-size:12px; color:var(--ink-soft); }
-  .item-detail-row.st-enviado{ background:var(--success-soft); }
-  .item-detail-row.st-no_enviado{ background:var(--danger-soft); }
-  .idr-controls{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-  .idr-controls .qty-input{ min-height:38px; }
-  .chk{ display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--ink-soft); cursor:pointer; user-select:none; }
-  .chk input{ width:16px; height:16px; }
-  .idr-motivo{ margin-top:8px; display:grid; grid-template-columns:1fr auto; gap:8px; }
-  .idr-motivo input[type=text]{ font-size:13px; }
-  .idr-motivo input[type=date]{ font-size:13px; width:150px; }
-  @media (max-width:480px){ .idr-motivo{ grid-template-columns:1fr; } .idr-motivo input[type=date]{ width:100%; } }
-
-  .save-bar{ position:sticky; bottom:0; background:var(--bg); padding:12px 0 4px; border-top:1px solid var(--border); display:flex; gap:10px; }
-
-  .catalog-item{ display:flex; align-items:center; gap:10px; padding:7px 16px; border-top:1px solid var(--border); flex-wrap:wrap; }
-  .catalog-item:first-of-type{ border-top:none; }
-  .catalog-item .ci-name{ flex:1; font-size:14px; min-width:120px; }
-  .catalog-item .ci-controls{ display:flex; align-items:center; gap:6px; margin-left:auto; }
-  select.ci-cat-select{ width:auto; min-height:30px; padding:4px 6px; font-size:12px; }
-  .catalog-add{ display:flex; gap:8px; padding:10px 16px 14px; }
-  .catalog-add input{ flex:1; }
-
-  .banner{ background:var(--accent-soft); color:var(--accent-soft-ink); border-radius:var(--radius); padding:11px 14px; font-size:13px; margin-bottom:14px; border:1px solid var(--border-strong); }
-  .success-screen{ padding:40px 20px; text-align:center; }
-  .success-screen .big{ font-size:34px; margin-bottom:10px; }
-  .success-screen h2{ font-size:18px; margin-bottom:6px; }
-  .success-screen p{ color:var(--ink-soft); font-size:14px; margin:0 0 20px; }
-
-  ::selection{ background:var(--accent-soft); }
-
-  .print-sheet{ display:none; }
-  @media print{
-    body > *:not(.print-sheet){ display:none !important; }
-    .print-sheet{ display:block !important; padding:10px; color:#111; font-family:'Poppins',sans-serif; }
-    .print-sheet h1{ font-size:18px; margin:0 0 6px; font-family:'Cinzel',serif; }
-    .print-sheet .ps-meta{ font-size:12.5px; color:#333; margin-bottom:4px; }
-    .print-sheet .ps-cat{ font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; margin:16px 0 4px; border-bottom:1px solid #999; padding-bottom:3px; }
-    .print-sheet .ps-item{ display:flex; align-items:center; gap:10px; padding:5px 0; font-size:13px; border-bottom:1px dotted #ccc; }
-    .print-sheet .ps-check{ width:13px; height:13px; border:1.4px solid #333; flex:none; }
-    .print-sheet .ps-name{ flex:1; }
-    .print-sheet .ps-qty{ font-weight:700; font-family:'IBM Plex Mono',monospace; min-width:30px; text-align:right; }
-  }
+/* Tooltip en encabezados */
+.thtt{position:relative;cursor:help}
+.thtt .tip{display:none;position:absolute;top:calc(100% + 4px);right:0;background:var(--CH);color:var(--CR);font-size:11px;font-weight:400;text-transform:none;letter-spacing:0;padding:6px 9px;border-radius:6px;white-space:normal;min-width:150px;max-width:210px;z-index:20;text-align:left;line-height:1.4}
+.thtt:first-child .tip,.thtt:nth-child(2) .tip{left:0;right:auto}
+.thtt:hover .tip{display:block}
+.ii{font-size:9px;vertical-align:super;margin-left:2px;opacity:.65}
+/* Local selector en RESUMEN */
+.res-locals{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px}
+.res-lcard{background:var(--WH);border-radius:10px;padding:12px 14px;box-shadow:0 1px 4px rgba(52,23,18,.08);border:2px solid transparent;cursor:pointer;transition:.15s}
+.res-lcard:hover{border-color:var(--BD)}
+.res-lcard.sel{border-color:var(--M)}
+.res-lcard .nm{font-size:11px;font-weight:700;color:var(--M);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+.res-lcard .vv{font-size:18px;font-weight:800;color:var(--M)}
+.res-lcard .rr{display:flex;justify-content:space-between;font-size:11px;margin-top:4px;color:var(--GR)}
+.res-lcard .rr span:last-child{font-weight:700;color:var(--CH)}
+@media(max-width:900px){
+  .krow,.lrow,.cgrid,.g2,.g3{grid-template-columns:1fr 1fr}
+  .ug3{grid-template-columns:1fr}.cnt{padding:12px 10px}
+}
+@media(max-width:600px){.krow,.lrow,.cgrid,.g2,.g3{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
-<header class="top">
-  <div class="head-row">
+<!-- =========== UPLOAD =========== -->
+<div id="upl">
+  <div class="logo">Doma <span>Criolla</span></div>
+  <p class="sub">Tablero de Gestión de Ventas · Subí los exports de Fudo para generar el informe</p>
+
+  <!-- ACCESO DIRECCIÓN -->
+  <div style="background:linear-gradient(135deg,#3E2723,#6D4C41);border-radius:14px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
     <div>
-      <h1>Pedidos de Insumos — Doma Criolla</h1>
+      <div style="color:#FFCC80;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">📊 Gerencia</div>
+      <div style="color:#fff;font-size:16px;font-weight:700;margin-bottom:2px">¿Querés ver cómo viene el negocio?</div>
+      <div style="color:#D7CCC8;font-size:12px">Accedé al tablero con los últimos datos guardados, sin necesidad de cargar archivos.</div>
     </div>
-    <div class="user-box">
-      <button class="refresh" id="refreshBtn" type="button">⟳ Actualizar</button>
+    <button onclick="loadFromCloud()" style="background:#FFCC80;color:#3E2723;border:none;border-radius:10px;padding:12px 22px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0" onmouseover="this.style.background='#FFE0B2'" onmouseout="this.style.background='#FFCC80'">Ver tablero →</button>
+  </div>
+
+  <div class="slbl">Exports de Fudo — 3 locales</div>
+  <div class="ug3">
+    <div class="dz" id="dz-z"><div class="ln">Zelarrayan</div><div class="ic">📂</div><div class="ht">XLS / XLSX</div><input type="file" accept=".xls,.xlsx" onchange="loadXLS(event,'Zelarrayan')"></div>
+    <div class="dz" id="dz-c"><div class="ln">Centro</div><div class="ic">📂</div><div class="ht">XLS / XLSX</div><input type="file" accept=".xls,.xlsx" onchange="loadXLS(event,'Centro')"></div>
+    <div class="dz" id="dz-p"><div class="ln">Patagonia</div><div class="ic">📂</div><div class="ht">XLS / XLSX</div><input type="file" accept=".xls,.xlsx" onchange="loadXLS(event,'Patagonia')"></div>
+  </div>
+
+  <hr class="dv">
+  <div class="slbl">Archivo de costos (opcional)</div>
+  <div class="ug2">
+    <div class="dz" id="dz-cost" style="padding:14px"><div class="ic">💰</div><div class="ht">costos productos.xlsx — arrastrá o hacé clic</div><input type="file" accept=".xls,.xlsx" onchange="loadCost(event)"></div>
+    <div>
+      <div class="slbl" style="margin-top:0;margin-bottom:6px">Período del informe</div>
+      <input type="text" id="inp-period" class="inp" placeholder="ej: Julio 2026">
     </div>
   </div>
-  <nav class="tabs" id="tabs">
-    <button data-tab="nuevo">Nuevo pedido</button>
-    <button data-tab="pedidos">Pedidos y envíos <span class="count" id="pendingCount" style="display:none">0</span></button>
-    <button data-tab="catalogo">Catálogo</button>
-  </nav>
-</header>
 
-<div class="wrap">
-  <main id="main">
-    <div class="empty"><div class="big">🧾</div>Cargando…</div>
-  </main>
+  <div class="slbl" style="margin-top:14px">Edición Limitada — mes actual (opcional)</div>
+  <div class="ug2">
+    <input type="text" id="inp-ed-name" class="inp" placeholder="Nombre del sabor (ej: Chori Parmesano H)">
+    <input type="number" id="inp-ed-cost" class="inp" placeholder="Costo con IVA ($)">
+  </div>
+  <p class="note">La Edición Limitada cambia cada mes. Si no tenés el costo, dejalo vacío — se puede agregar después.</p>
+
+  <div id="del-manual-section" style="margin-top:18px">
+  <div style="font-size:11px;font-weight:700;color:var(--GR);margin-bottom:10px;padding-left:9px;border-left:3px solid var(--BD)">Costos de delivery por local</div>
+  <div class="ug3" style="margin-bottom:4px">
+    <!-- ZELARRAYAN -->
+    <div style="background:var(--GL);border-radius:10px;padding:13px;border-top:3px solid var(--M)">
+      <div style="font-size:11px;font-weight:700;color:var(--M);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Zelarrayan</div>
+      <div class="slbl" style="margin:0 0 3px">Cadete Ya ($)</div>
+      <input type="number" id="inp-z-cy" class="inp" style="margin-bottom:7px" placeholder="$" min="0">
+      <div class="slbl" style="margin:0 0 3px">Squad ($)</div>
+      <input type="number" id="inp-z-sq" class="inp" style="margin-bottom:7px" placeholder="$" min="0">
+      <div class="slbl" style="margin:0 0 3px">Viajes Cadete Ya ($)</div>
+      <input type="number" id="inp-z-ecy" class="inp" style="margin-bottom:7px" placeholder="$" min="0">
+      <div class="slbl" style="margin:0 0 3px">Rapiboy ($)</div>
+      <input type="number" id="inp-z-erb" class="inp" style="margin-bottom:7px" placeholder="$" min="0">
+      <div class="slbl" style="margin:0 0 3px">Uber Envíos ($)</div>
+      <input type="number" id="inp-z-eub" class="inp" placeholder="$" min="0">
+    </div>
+    <!-- CENTRO -->
+    <div style="background:var(--GL);border-radius:10px;padding:13px;border-top:3px solid var(--M)">
+      <div style="font-size:11px;font-weight:700;color:var(--M);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Centro</div>
+      <div class="slbl" style="margin:0 0 3px">Cadete Ya ($)</div>
+      <input type="number" id="inp-c-cy" class="inp" style="margin-bottom:7px" placeholder="$" min="0">
+      <div class="slbl" style="margin:0 0 3px">Squad ($)</div>
+      <input type="number" id="inp-c-sq" class="inp" style="margin-bottom:7px" placeholder="$" min="0">
+      <div class="slbl" style="margin:0 0 3px">Viajes Cadete Ya ($)</div>
+      <input type="number" id="inp-c-ecy" class="inp" style="margin-bottom:7px" placeholder="$" min="0">
+      <div class="slbl" style="margin:0 0 3px">Rapiboy ($)</div>
+      <input type="number" id="inp-c-erb" class="inp" style="margin-bottom:7px" placeholder="$" min="0">
+      <div class="slbl" style="margin:0 0 3px">Uber Envíos ($)</div>
+      <input type="number" id="inp-c-eub" class="inp" placeholder="$" min="0">
+    </div>
+    <!-- PATAGONIA -->
+    <div style="background:var(--GL);border-radius:10px;padding:13px;border-top:3px solid var(--M)">
+      <div style="font-size:11px;font-weight:700;color:var(--M);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Patagonia</div>
+      <div class="slbl" style="margin:0 0 3px">Cadete Ya ($)</div>
+      <input type="number" id="inp-p-cy" class="inp" style="margin-bottom:7px" placeholder="$" min="0">
+      <div class="slbl" style="margin:0 0 3px">Squad ($)</div>
+      <input type="number" id="inp-p-sq" class="inp" style="margin-bottom:7px" placeholder="$" min="0">
+      <div class="slbl" style="margin:0 0 3px">Elsa ($)</div>
+      <input type="number" id="inp-p-el" class="inp" style="margin-bottom:7px" placeholder="$" min="0">
+      <div class="slbl" style="margin:0 0 3px">Viajes Cadete Ya ($)</div>
+      <input type="number" id="inp-p-ecy" class="inp" style="margin-bottom:7px" placeholder="$" min="0">
+      <div class="slbl" style="margin:0 0 3px">Rapiboy ($)</div>
+      <input type="number" id="inp-p-erb" class="inp" style="margin-bottom:7px" placeholder="$" min="0">
+      <div class="slbl" style="margin:0 0 3px">Uber Envíos ($)</div>
+      <input type="number" id="inp-p-eub" class="inp" placeholder="$" min="0">
+    </div>
+  </div>
+  </div>
+  <p class="note">Estos datos se guardan con el informe y se usan para calcular el costo real de delivery.</p>
+
+  <hr class="dv">
+  <div class="slbl">Datos históricos</div>
+
+  <div class="irow" style="margin-bottom:10px">
+    <label><strong>☁️ Traer histórico desde la nube:</strong> carga los meses anteriores guardados en Google Drive para combinarlos con los XLS nuevos.</label>
+    <button class="btn-s" id="btn-cloud-hist" onclick="loadCloudAsHist()" style="white-space:nowrap;border-color:var(--OR);color:var(--OR)">☁️ Cargar histórico</button>
+  </div>
+
+  <div class="irow" style="margin-bottom:10px">
+    <label><strong>O desde archivo JSON:</strong> importá el JSON guardado localmente.</label>
+    <button class="btn-s" id="btn-hist" onclick="document.getElementById('inp-hist').click()">📅 Agregar JSON</button>
+    <input type="file" id="inp-hist" accept=".json" style="display:none" onchange="loadHist(event)">
+  </div>
+  <div id="hist-status" style="font-size:11px;color:var(--GN);margin-bottom:6px;display:none">✅ Histórico cargado: <span id="hist-label"></span></div>
+
+  <div class="irow">
+    <label><strong>Solo ver (sin subir XLS):</strong> abrí un JSON o cargá desde la nube para ver datos ya procesados.</label>
+    <button class="btn-s" onclick="document.getElementById('inp-json').click()">📂 Ver JSON</button>
+    <input type="file" id="inp-json" accept=".json" style="display:none" onchange="importJSON(event)">
+  </div>
+
+  <hr class="dv">
+  <div class="slbl">☁️ Google Drive — sincronización en la nube</div>
+  <div id="cloud-load-row" style="display:none;margin-bottom:10px">
+    <div style="background:#f0f8f0;border:1px solid #c8e6c9;border-radius:8px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+      <div>
+        <div style="font-weight:700;font-size:12px;color:#2E7D32;margin-bottom:2px">☁️ Nube configurada</div>
+        <div style="font-size:11px;color:var(--GR)" id="cloud-last-note">Cargá el último informe guardado directamente.</div>
+      </div>
+      <button class="btn-s" id="btn-load-cloud" onclick="loadFromCloud()" style="white-space:nowrap;border-color:var(--GN);color:var(--GN)">☁️ Cargar desde la nube</button>
+    </div>
+  </div>
+  <div class="irow" style="margin-bottom:6px">
+    <label id="cloud-config-label" style="color:var(--GR);font-size:12px">Conectá con Google Drive para que dirección pueda ver el tablero desde cualquier dispositivo sin cargar archivos.</label>
+    <button class="btn-s" onclick="toggleCloudConfig()" id="btn-cloud-cfg" style="white-space:nowrap">⚙️ Configurar URL</button>
+  </div>
+  <div id="cloud-url-row" style="display:none;margin-bottom:6px">
+    <div style="display:flex;gap:8px">
+      <input type="text" id="inp-cloud-url" class="inp" placeholder="https://script.google.com/macros/s/...">
+      <button class="btn-s" onclick="saveCloudUrl()" style="white-space:nowrap">Guardar</button>
+    </div>
+  </div>
+  <div id="cloud-url-status" style="font-size:11px;color:var(--GN);margin-bottom:4px"></div>
+
+  <button class="btn-p" id="btn-go" disabled onclick="buildDash()">Generar tablero →</button>
+  <div class="errmsg" id="errmsg"></div>
 </div>
 
-<div class="toast" id="toast"></div>
-<div class="print-sheet" id="printSheet"></div>
+<!-- =========== DASHBOARD =========== -->
+<div id="dash">
+  <div class="topbar">
+    <div><div class="br">Doma <span>Criolla</span> · Gestión</div><div class="pd" id="top-pd"></div></div>
+    <div class="tbas">
+      <button class="btnb" id="btn-cloud-save" onclick="saveToCloud()" style="display:none">☁️ Guardar en la nube</button>
+      <button class="btnb" onclick="exportExcel()" style="background:var(--GN);color:#fff;border-color:var(--GN)">📊 Exportar Excel</button>
+      <button class="btnb" onclick="exportJSON()">💾 Guardar JSON</button>
+      <button class="btnb" onclick="location.reload()">↩ Nuevo informe</button>
+    </div>
+  </div>
+  <div class="ltabs" id="ltabs"></div>
+  <div class="stabs" id="stabs"></div>
+  <div id="local-tabs" style="background:var(--WH);border-bottom:1px solid var(--BD);padding:0 20px;position:sticky;top:135px;z-index:97"></div>
+  <div class="cnt" id="cnt"></div>
+</div>
 
 <script>
-(function(){
-  "use strict";
+// ======== CONSTANTS ========
+const LOCALS=['Zelarrayan','Centro','Patagonia'];
+const DOW=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+const CAT_ORDER=['Empanadas Horno','Empanadas Fritas','Empanadas Copetín','Pizzas','Postres','Dips',
+  'Bebidas — Gaseosas','Bebidas — Cervezas','Bebidas — Vinos','Bebidas — Jugos y Aguas','Promos','Menú Infantil'];
+const CAT_MAP={
+  'HORNEADAS':'Empanadas Horno','Horneadas':'Empanadas Horno',
+  'EMPANADAS FRITAS':'Empanadas Fritas','Fritas':'Empanadas Fritas','FRITAS':'Empanadas Fritas',
+  'Copetin':'Empanadas Copetín',
+  'Pizzas enteras':'Pizzas','Pizzas Enteras':'Pizzas',
+  // Pizza por mitades: el CONTENEDOR se ignora en Adiciones; los sabores vienen de Modificadores con qty×0.5
+  'PIZZA POR MITADES':null,'Pizzas por mitades':null,'Pizzas por Mitades':null,
+  'POSTRES':'Postres','DIPS':'Dips',
+  'GASEOSAS':'Bebidas — Gaseosas','Gaseosas':'Bebidas — Gaseosas','Productos':'Bebidas — Gaseosas','Opcionales':'Bebidas — Gaseosas',
+  'CERVEZAS':'Bebidas — Cervezas','Cervezas':'Bebidas — Cervezas',
+  'Vinos':'Bebidas — Vinos','VINOS':'Bebidas — Vinos',
+  'JUGOS Y AGUAS':'Bebidas — Jugos y Aguas','Jugos y aguas':'Bebidas — Jugos y Aguas',
+  'PROMOS':'Promos',
+  'ENVIO':null,'Envío':null
+};
+// Productos individuales de Pedidos Ya que PY renombra — van a su categoría real
+function inferPYCat(name){
+  const n=name.toLowerCase();
+  if(/\bh$/i.test(name.trim())||/horneada|al horno/.test(n))return'Empanadas Horno';
+  if(/\bf$/i.test(name.trim())||/frita/.test(n))return'Empanadas Fritas';
+  if(/pizza/.test(n))return'Pizzas';
+  if(/imperial|heineken|cerveza|ipa\b|lager|apa\b|scalonipa|kamikaze|playita|moka|pomelito|rubia|doble ipa/.test(n))return'Bebidas — Cervezas';
+  if(/coca|cola cola|sprite|fanta|schweppes|7up|pepsi|gaseosa/.test(n))return'Bebidas — Gaseosas';
+  if(/aquarius|bonaqua|agua\b|jugo/.test(n))return'Bebidas — Jugos y Aguas';
+  if(/vino|malbec|cabernet|tintas/.test(n))return'Bebidas — Vinos';
+  if(/\bdip\b/.test(n))return'Dips';
+  if(/postre|cheesecake|tiramis|chocotorta|franui/.test(n))return'Postres';
+  return'Promos';// si no puede inferir, tratar como promo
+}
+const PAY_NORM={
+  'Alias: domazelarrayan':'Transferencia','Alias: domacentro':'Transferencia','Alias: patagoniadoma':'Transferencia',
+  'Qr posnet':'Posnet QR','Posnet qr':'Posnet QR'
+};
+const COST_ALIAS={
+  'Crema de ajos Dip':'Dip alioli','Panceta y ciruela H':'Panceta y ciruela',
+  'Pizza Especial':'Pizzas Especial','Cheesecake':'CHESEECAKE','Tiramisú':'TIRAMISU',
+  'La Scalonipa IPA':'Scalonipa','Heineken':'Heineken 473ml','Heineken lata':'Heineken 473ml',
+  'Heineken s/a':'Heineken Cero','Chill de cojones Doble IPA':'Chill Doble IPA',
+  // Dips
+  'Chilecito Dip':'Dip Chilecito','Chilecito dip':'Dip Chilecito',
+  'Morron agridulce Dip':'Dip Morrón Agridulce','Morrón agridulce Dip':'Dip Morrón Agridulce',
+  'Morron Agridulce Dip':'Dip Morrón Agridulce','Morrón Agridulce Dip':'Dip Morrón Agridulce'
+};
 
-  var CATEGORIES = [
-    {key:"LIMPIEZA", label:"Limpieza"},
-    {key:"LIBRERIA", label:"Librería"},
-    {key:"FARMACIA", label:"Farmacia"},
-    {key:"IMPRESIONES", label:"Impresiones"},
-    {key:"PACKAGING", label:"Packaging"}
-  ];
-  var CAT_LABEL = {};
-  CATEGORIES.forEach(function(c){ CAT_LABEL[c.key]=c.label; });
+// ── Unificación de nombres de producto (variantes de Fudo → nombre canónico) ──
+// Agregar acá cualquier par "nombre en Fudo": "nombre canónico" que necesite unificarse
+const PROD_ALIAS={
+  'Panceta y Verdeo Horneada':'Panceta y Verdeo H',
+  'Panceta y Verdeo horneada':'Panceta y Verdeo H',
+  'Panceta y verdeo H':'Panceta y Verdeo H',
+  'Panceta y verdeo Horneada':'Panceta y Verdeo H',
+  'Pizza Cinco quesos':'Pizza Cinco Quesos',
+  'pizza cinco quesos':'Pizza Cinco Quesos',
+  'CAJITA CRIOLLA':'Cajita Criolla',
+  'cajita criolla':'Cajita Criolla',
+  'LOS PATOS 4 TINTAS':'Los Patos 4 Tintas',
+  'Los Patos 4 tintas':'Los Patos 4 Tintas',
+  'LOS PATOS 4 TINTAS COLECCION':'Los Patos 4 Tintas',
+  'Los Patos 4 Tintas Coleccion':'Los Patos 4 Tintas',
+  'Los Patos Coleccion Malbec':'Los Patos Malbec',
+  // Pedidos Ya — empanadas horneadas
+  '(PY) Empanada de jamon y queso al horno':'Jamon y queso H',
+  '(PY) Empanada de Jamon y queso al horno':'Jamon y queso H',
+  '(PY) Empanada de jamon y Queso al horno':'Jamon y queso H',
+  '(PY) Empanada de carne al horno':'Carne H',
+  '(PY) Empanada de Carne al horno':'Carne H',
+  '(PY) Empanada de carne a cuchillo al horno':'Carne cuchillo H',
+  '(PY) Empanada de Carne a cuchillo al horno':'Carne cuchillo H',
+  '(PY) Empanada de carbonara al horno':'Carbonara H',
+  '(PY) Empanada de Carbonara al horno':'Carbonara H',
+  '(PY) Empanada de hamburguesa al horno':'Hamburguesa H',
+  '(PY) Empanada de Hamburguesa al horno':'Hamburguesa H',
+  '(PY) Empanada de Hamburguesa':'Hamburguesa H',
+  '(PY) Empanada de hamburguesa':'Hamburguesa H',
+  '(PY) Empanada de verdura al horno':'Verdura H',
+  '(PY) Empanada de Verdura al horno':'Verdura H',
+  '(PY) Empanada de pollo y cheddar al horno':'Pollo y cheddar H',
+  '(PY) Empanada de Pollo y cheddar al horno':'Pollo y cheddar H',
+  '(PY) Empanada de choclo al horno':'Choclo H',
+  '(PY) Empanada de Choclo al horno':'Choclo H',
+  '(PY) Empanada de roquefort al horno':'Roquefort H',
+  '(PY) Empanada de Roquefort al horno':'Roquefort H',
+  '(PY) Empanada de pastel de papa al horno':'Pastel de papa H',
+  '(PY) Empanada de Pastel de papa al horno':'Pastel de papa H',
+  '(PY) Empanada de pastel de papa':'Pastel de papa H',
+  '(PY) Empanada de Pastel de papa':'Pastel de papa H',
+  '(PY) Empanada de carne picante al horno':'Carne picante H',
+  '(PY) Empanada de Carne picante al horno':'Carne picante H',
+  '(PY) Empanada de panceta y verdeo al horno':'Panceta y Verdeo H',
+  '(PY) Empanada de Panceta y verdeo al horno':'Panceta y Verdeo H',
+  '(PY) Empanada de panceta y verdeo':'Panceta y Verdeo H',
+  '(PY) Empanada de Panceta y verdeo':'Panceta y Verdeo H',
+  '(PY) Empanada de cebolla y queso al horno':'Queso y cebolla H',
+  '(PY) Empanada de Cebolla y queso al horno':'Queso y cebolla H',
+  '(PY) Empanada de queso y cebolla al horno':'Queso y cebolla H',
+  '(PY) Empanada de carne y queso al horno':'Carne y queso H',
+  '(PY) Empanada de Carne y queso al horno':'Carne y queso H',
+  '(PY) Empanada de pollo al horno':'Pollo H',
+  '(PY) Empanada de Pollo al horno':'Pollo H',
+  '(PY) Empanada capresse al horno':'Capresse H',
+  '(PY) Empanada de Capresse al horno':'Capresse H',
+  '(PY) Empanada de edicion limitada al horno':'Edición Limitada H',
+  '(PY) Empanada de Edicion limitada al horno':'Edición Limitada H',
+  // Pedidos Ya — empanadas fritas
+  '(PY) Empanada de carne frita':'Carne F',
+  '(PY) Empanada de Carne frita':'Carne F',
+  '(PY) Empanada Estilo Campo frita':'Estilo campo F',
+  '(PY) Empanada estilo campo frita':'Estilo campo F',
+  '(PY) Empanada de pollo frita':'Pollo F',
+  '(PY) Empanada de Pollo frita':'Pollo F',
+  '(PY) Empanada de roquefort frita':'Roquefort F',
+  '(PY) Empanada de Roquefort frita':'Roquefort F',
+  '(PY) Empanada de jamon y queso frita':'Jamon y queso F',
+  '(PY) Empanada de verdura frita':'Verdura F',
+  '(PY) Empanada de carne a cuchillo frita':'Carne cuchillo F',
+  '(PY) Empanada de hamburguesa frita':'Hamburguesa F',
+  '(PY) Empanada de Hamburguesa frita':'Hamburguesa F',
+  // Pedidos Ya — variantes sin "de"
+  '(PY) Empanada carbonara al horno':'Carbonara H',
+  '(PY) Empanada Carbonara al horno':'Carbonara H',
+  '(PY) Empanada capresse al horno':'Capresse H',
+  '(PY) Empanada Capresse al horno':'Capresse H',
+  '(PY) Empanada Cerdo A La Mostaza':'Cerdo a la mostaza H',
+  '(PY) Empanada cerdo a la mostaza':'Cerdo a la mostaza H',
+  '(PY) Empanada de panceta y ciruelas al horno':'Panceta y ciruela H',
+  '(PY) Empanada de Panceta y ciruelas al horno':'Panceta y ciruela H',
+  '(PY) Empanada de jamón y queso frita':'Jamon y queso F',
+  '(PY) Empanada de Jamón y queso frita':'Jamon y queso F',
+  '(PY) Empanada de panceta y verdeo frita':'Panceta y Verdeo F',
+  '(PY) Empanada de Panceta y verdeo frita':'Panceta y Verdeo F',
+  '(PY) Empanada de calabresa al horno':'Calabresa H',
+  '(PY) Empanada de Calabresa al horno':'Calabresa H',
+  '(PY) Empanada calabresa al horno':'Calabresa H',
+  '(PY) Empanada de cerdo a la mostaza al horno':'Cerdo a la mostaza H',
+  // Sin prefijo (PY) — variantes con "al horno" / "frita" sin H/F
+  'Empanada de choclo al horno':'Choclo H',
+  'Empanada de verdura al horno':'Verdura H',
+  'Empanada carbonara al horno':'Carbonara H',
+  'Empanada de roquefort al horno':'Roquefort H',
+  'Empanada de Roquefort al horno':'Roquefort H',
+  'Carne picante al horno':'Carne picante H',
+  'Empanada de pollo al horno':'Pollo H',
+  'Empanada de Pollo al horno':'Pollo H',
+  'Empanada capresse al horno':'Capresse H',
+  'Empanada de Capresse al horno':'Capresse H',
+  'Pollo y cheddar al horno':'Pollo y cheddar H',
+  'Empanada de carne al horno':'Carne H',
+  'Empanada de Carne al horno':'Carne H',
+  'Empanada calabresse al horno':'Calabresa H',
+  'Empanada de calabresa al horno':'Calabresa H',
+  'Panceta y ciruelas al horno':'Panceta y ciruela H',
+  'Empanada de panceta y ciruelas al horno':'Panceta y ciruela H',
+  'Empanada de Hamburguesa':'Hamburguesa H',
+  'Empanada de hamburguesa':'Hamburguesa H',
+  'Empanada de jamon y queso al horno':'Jamon y queso H',
+  'Empanada de Jamon y queso al horno':'Jamon y queso H',
+  'Empanada de carne a cuchillo al horno':'Carne cuchillo H',
+  'Empanada de Carne a cuchillo al horno':'Carne cuchillo H',
+  'Empanada de carne picante al horno':'Carne picante H',
+  'Empanada de Carne picante al horno':'Carne picante H',
+  'Empanada de panceta y verdeo al horno':'Panceta y Verdeo H',
+  'Empanada de Panceta y verdeo al horno':'Panceta y Verdeo H',
+  'Empanada de cebolla y queso al horno':'Queso y cebolla H',
+  'Empanada de carne y queso al horno':'Carne y queso H',
+  'Empanada de pastel de papa al horno':'Pastel de papa H',
+  'Empanada de pastel de papa':'Pastel de papa H',
+  'Empanada de pollo y cheddar al horno':'Pollo y cheddar H',
+  'Empanada de carne frita':'Carne F',
+  'Empanada estilo campo frita':'Estilo campo F',
+  'Empanada Estilo Campo frita':'Estilo campo F',
+  'Empanada de pollo frita':'Pollo F',
+  'Empanada de roquefort frita':'Roquefort F',
+  'Empanada de jamon y queso frita':'Jamon y queso F',
+  'Empanada de carne a cuchillo frita':'Carne cuchillo F',
+  'Empanada de panceta y verdeo frita':'Panceta y Verdeo F',
+  // Variantes con tilde y formas cortas (sin "Empanada de" ni prefijo)
+  'Jamón y queso al horno':'Jamon y queso H',
+  'Jamon y queso al horno':'Jamon y queso H',
+  '(PY) Empanada de jamón y queso al horno':'Jamon y queso H',
+  '(PY) Empanada de Jamón y queso al horno':'Jamon y queso H',
+  'Carne a cuchillo al horno':'Carne cuchillo H',
+  'Carne y queso al horno':'Carne y queso H',
+  'Pollo y cheddar al horno':'Pollo y cheddar H',
+  'Carne picante al horno':'Carne picante H',
+  'Cerdo a la barbacoa horneada':'Cerdo a la barbacoa H',
+  'Cerdo a la Barbacoa H':'Cerdo a la barbacoa H',
+  'Suprema pastora horneada':'Suprema Pastora H',
+  'Suprema Pastora H':'Suprema Pastora H',
+  '(PY) Empanada de atun':'Atún H',
+  '(PY) Empanada de Atun':'Atún H',
+  '(PY) Empanada de atún':'Atún H',
+  // Edición limitada (empanada especial del mes)
+  'Edición limitada':'Edición Limitada H',
+  'Edicion limitada':'Edición Limitada H',
+  '(PY) Edición limitada':'Edición Limitada H',
+  '(PY) Edicion limitada':'Edición Limitada H'
+};
+function normProdName(name){
+  if(PROD_ALIAS[name])return PROD_ALIAS[name];
+  const lo=name.toLowerCase();
+  for(const[k,v]of Object.entries(PROD_ALIAS))if(k.toLowerCase()===lo)return v;
+  return name;
+}
+const UNTRACK_KEYS=['(PY) 3 EMPANADAS','AO PLUS','AO+'];
+// Productos que deben ir a Promos aunque su categoría Fudo no esté mapeada
+function isForcePromo(name){
+  const u=name.toUpperCase();
+  return /PAGÁ?\s*12|PAGA\s*12|LLEV[AÁ].*SALSA|PROMO\b|COMBO\b/.test(u);
+}
+// Productos que NUNCA son Promos aunque aparezcan en Modificadores
+function isNeverPromo(name){
+  const n=name.toLowerCase();
+  if(/\bH$/.test(name.trim())||/\bF$/.test(name.trim()))return true;// empanadas canónicas
+  return /empanada|edici[oó]n\s*limitada|pizza\s+\w|postre|cheesecake|cerveza|gaseosa|\bdip\b/.test(n);
+}
+// Productos a excluir completamente (ruido del sistema o productos discontinuados)
+function isExclude(name){
+  if(/gen[eé]rico\s*(mas|más)?delivery/i.test(name)||/^gen[eé]rico$/i.test(name.trim()))return true;
+  if(/bondiola\s*agridulce/i.test(name))return true;
+  if(/empanada\s*de\s*at[uú]n|^at[uú]n\s*H$/i.test(name))return true;
+  if(/salsa\s*gratis/i.test(name))return true;
+  return false;
+}
+const SECS=[
+  {id:'evolucion',lb:'📈 Evolución'},
+  {id:'resumen',lb:'📊 Resumen'},
+  {id:'ventas',lb:'🛒 Ventas'},
+  {id:'origen',lb:'🚴 Origen'},
+  {id:'promedios',lb:'📅 Prom. por turno'},
+  {id:'vendedores',lb:'👤 Vendedores'},
+  {id:'envios',lb:'📦 Envíos'},
+  {id:'costos',lb:'💰 Costos'}
+];
 
-  var LOCALES = [
-    {key:"CENTRO", label:"Local Centro"},
-    {key:"PATAGONIA", label:"Local Patagonia"},
-    {key:"ZELARRAYAN", label:"Local Zelarrayán"}
-  ];
-  var LOCAL_LABEL = {};
-  LOCALES.forEach(function(l){ LOCAL_LABEL[l.key]=l.label; });
+// ======== HELPERS ========
+const fm$=n=>'$ '+Math.round(n||0).toLocaleString('es-AR');
+const fmN=(n,d=1)=>(+n||0).toLocaleString('es-AR',{maximumFractionDigits:d});
+const fmPct=(a,b)=>b?(fmN(a/b*100,1)+'%'):'—';
+const fmD=s=>{if(!s)return'';const[y,m,d]=s.split('-');return`${d}/${m}/${y}`};
+function getDOWi(ds){const j=new Date(ds+'T12:00:00Z').getUTCDay();return j===0?6:j-1}
+function normPay(p){return PAY_NORM[String(p||'').trim()]||String(p||'').trim()||'Sin especificar'}
+function isUntrack(name){const u=name.toUpperCase();return UNTRACK_KEYS.some(k=>u.includes(k))}
+function getModCat(mod,grupo){
+  mod=String(mod||'').trim();grupo=String(grupo||'').trim();
+  if(!mod||mod==='ENVIO GRATIS'||grupo.toUpperCase().includes('ENVIO'))return null;
+  if(grupo==='MENU EJECUTIVO BEBIDA')return'Bebidas — Gaseosas';
+  if(grupo==='Pizza por mitades')return'Pizzas';
+  if(mod.endsWith(' Dip'))return'Dips';
+  if(/\bH$/.test(mod))return'Empanadas Horno';
+  if(/\bF$/.test(mod))return'Empanadas Fritas';
+  if(mod.startsWith('Pizza '))return'Pizzas';
+  return null;
+}
+function parseFecha(raw){
+  if(typeof raw==='number'&&raw>10000){
+    const d=new Date((Math.floor(raw)-25569)*86400000);
+    return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0');
+  }
+  const s=String(raw||'');
+  if(/^\d{4}-\d{2}-\d{2}/.test(s))return s.slice(0,10);
+  if(/^\d{2}\/\d{2}\/\d{4}/.test(s)){const[d,m,y]=s.split('/');return`${y}-${m}-${d}`}
+  return s.slice(0,10);
+}
+function getTurn(serial){
+  const h=(serial%1)*24;
+  if(h>=11.5&&h<14.5)return'Mediodía';
+  if(h>=19.5&&h<23.5)return'Noche';
+  return null;
+}
+function getCanal(tipo,origen){
+  tipo=String(tipo||'').trim();origen=String(origen||'').trim();
+  if(tipo==='Mostrador')return'Mostrador';
+  if(tipo==='Delivery'&&origen==='Pedidos Ya')return'PedidosYa';
+  if(tipo==='Delivery')return'Delivery';
+  return'Otro';
+}
+function lookupCost(name,costs,edName,edCost){
+  if(edName&&name===edName)return edCost||null;
+  if(!costs)return null;
+  if(costs[name]!=null)return costs[name];
+  const al=COST_ALIAS[name];
+  if(al&&costs[al]!=null)return costs[al];
+  const lo=name.toLowerCase();
+  for(const[k,v]of Object.entries(costs))if(k.toLowerCase()===lo)return v;
+  return null;
+}
 
-  // Pegá acá la URL que te da Apps Script al implementar (Implementar → Nueva
-  // implementación → Aplicación web), termina en /exec. Sin esto, la página
-  // no tiene con quién hablar para guardar ni leer los pedidos.
-  var API_URL = "https://script.google.com/macros/s/AKfycbw9tFfl_MMsORMq5-4iORIYeCZVagJuhkG0ODPs-upTVvOD60GPldXMr85p3ChT51D_/exec";
+// ======== COST FILE ========
+function processCostFile(data){
+  const wb=XLSX.read(data,{type:'binary',raw:true});
 
-  var catalogItems = [];
-  var pedidos = [];
-  var loaded = false;
-  var POLL_MS = 20000;
+  // Try sheet named 'Productos', then fall back to first sheet
+  const sheetName=wb.SheetNames.find(n=>n.toLowerCase().includes('producto'))||wb.SheetNames[0];
+  const ws=wb.Sheets[sheetName];
+  if(!ws)return{};
 
-  var state = {
-    tab: "nuevo",
-    detailId: null,
-    newOrderForm: null,
-    editForm: null,
-    filterEstado: "pendiente",
-    filterLocal: "TODOS",
-    adminUnlocked: false
+  const rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:''});
+
+  // Auto-detect header row: find the row that contains 'Descripción' (or 'Descripcion')
+  const DESC_KEYS=['Descripción','Descripcion','DESCRIPCIÓN','DESCRIPCION','descripción','descripcion'];
+  const COST_KEYS=['Costo con IVA','Costo Con IVA','COSTO CON IVA','Costo con Iva','costo con iva'];
+
+  let headerRow=-1;
+  let hi={};
+  for(let i=0;i<Math.min(20,rows.length);i++){
+    const row=rows[i];
+    const hasDesc=row.some(c=>DESC_KEYS.includes(String(c||'').trim()));
+    if(hasDesc){
+      headerRow=i;
+      row.forEach((h,j)=>{if(h)hi[String(h).trim()]=j});
+      break;
+    }
+  }
+
+  // If couldn't find by name, try column B (index 1) as description and column D (index 3) as cost
+  // based on known file structure
+  if(headerRow<0){
+    // Fallback: scan rows[5] which is the known position from the original file
+    const fallback=rows[5]||[];
+    if(fallback.length>0){
+      fallback.forEach((h,j)=>{if(h)hi[String(h).trim()]=j});
+      headerRow=5;
+    }
+  }
+
+  if(headerRow<0)return{};
+
+  // Determine which column key to use for cost
+  const costKey=Object.keys(hi).find(k=>COST_KEYS.includes(k))||'Costo con IVA';
+  const descKey=Object.keys(hi).find(k=>DESC_KEYS.includes(k))||'Descripción';
+
+  const costs={};
+  for(let r=headerRow+1;r<rows.length;r++){
+    const row=rows[r];
+    const nom=String(row[hi[descKey]]!=null?row[hi[descKey]]:'').trim();
+    const cost=parseFloat(row[hi[costKey]])||0;
+    if(nom&&cost)costs[nom]=cost;
+  }
+  return costs;
+}
+
+// ======== PROCESS LOCAL ========
+function mkBD(){return{ped:0,ven:0,mos:0,py:0,del:0,prod:0,td:{Mediodía:{ped:0,ven:0,mos:0,py:0,del:0},Noche:{ped:0,ven:0,mos:0,py:0,del:0}}}}
+
+function processLocal(name,data,costs,edName,edCost){
+  const wb=XLSX.read(data,{type:'binary',cellDates:false,raw:true});
+
+  // VENTAS
+  const vA=XLSX.utils.sheet_to_json(wb.Sheets['Ventas'],{header:1,raw:true,defval:''});
+  const vH=vA[3]||[];const vI={};
+  vH.forEach((h,i)=>{if(h)vI[String(h).trim()]=i});
+  const orders=new Map();
+  const menuOnlineIds=new Set(); // IDs de ventas con Origen = Menú Online
+  for(let r=4;r<vA.length;r++){
+    const row=vA[r];
+    const idRaw=row[vI['Id']];if(!idRaw)continue;
+    const idKey=String(idRaw).trim();
+    const origenRaw=String(row[vI['Origen']]||'').trim();
+    if(origenRaw.toLowerCase().includes('online'))menuOnlineIds.add(idKey);
+    if(String(row[vI['Estado']]||'').trim()!=='Cerrada')continue;
+    const dateStr=parseFecha(row[vI['Fecha']]);
+    const creSerial=parseFloat(row[vI['Creación']])||0;
+    const turno=getTurn(creSerial);
+    const canal=getCanal(String(row[vI['Tipo de Venta']]||''),origenRaw);
+    const total=parseFloat(row[vI['Total']])||0;
+    const emp=String(row[vI['Camarero / Repartidor']]||'').trim()||'Sin asignar';
+    const vend=String(row[vI['Cerrada por']]||'').trim()||'Sin asignar';
+    orders.set(idKey,{id:idKey,dateStr,turno,canal,total,emp,vend,origen:origenRaw});
+  }
+
+  // COSTOS DE ENVIOS — pre-process to get IDs and income
+  const costoEnviosIds=new Set();
+  let ingresoCE=0;
+  // Match sheet name ignoring accents: "Costos de Envíos", "costos de envios", etc.
+  function normStr(s){return String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase()}
+  const ceSheetName=wb.SheetNames.find(n=>normStr(n).includes('costos')&&normStr(n).includes('envio'));
+  console.log('[CE] sheet names:',wb.SheetNames,'→ found:',ceSheetName);
+  if(ceSheetName){
+    const ceA=XLSX.utils.sheet_to_json(wb.Sheets[ceSheetName],{header:1,raw:true,defval:''});
+    // Scan first 5 rows for the header (Fudo often has title rows before actual headers)
+    let ceHdrRow=0;
+    const ceKEY_COLS=['Valor','Monto','Importe','Cancelado','Cancelada','Id. Venta','Id Venta','Costo'];
+    for(let r=0;r<Math.min(5,ceA.length);r++){
+      const row=ceA[r];
+      const found=ceKEY_COLS.some(k=>row.some(c=>String(c||'').trim()===k));
+      if(found){ceHdrRow=r;break;}
+    }
+    const ceH=ceA[ceHdrRow]||[];const ceI2={};
+    ceH.forEach((h,i)=>{if(h)ceI2[String(h).trim()]=i});
+    const ceCanc=ceI2['Cancelado']??ceI2['Cancelada'];
+    const ceId=ceI2['Id. Venta']??ceI2['Id Venta'];
+    const ceVal=ceI2['Valor']??ceI2['Monto']??ceI2['Importe']??ceI2['Costo de Envío']??ceI2['Costo de Envio']??ceI2['Costo']??ceI2['Total']??ceI2['Precio']??ceI2['Monto de Envío']??ceI2['Monto de Envio'];
+    const ceColName=ceVal!=null?Object.keys(ceI2).find(k=>ceI2[k]===ceVal)||'?':'(no encontrada)';
+    console.log('[CE] hdrRow:',ceHdrRow,'col importe:',ceColName,'idx:',ceVal,'cols:',Object.keys(ceI2));
+    for(let r=ceHdrRow+1;r<ceA.length;r++){
+      const row=ceA[r];
+      if(ceCanc!=null&&String(row[ceCanc]||'').trim().toLowerCase()==='si')continue;
+      const oid2=ceId!=null?row[ceId]:null;
+      if(oid2)costoEnviosIds.add(String(oid2).trim());
+      ingresoCE+=ceVal!=null?parseFloat(row[ceVal])||0:0;
+    }
+  }
+  let ingresoEnvioAdic=0;// from Adiciones "Envio" not already in CE
+  let enviosSinCargo=0; // count of free deliveries
+
+  // Pre-scan Modificadores para detectar productos padre de combos (tienen sub-ítems)
+  const mAQ=XLSX.utils.sheet_to_json(wb.Sheets['Adiciones de Modificadores'],{header:1,raw:true,defval:''});
+  const mHQ=mAQ[0]||[];const mIQ={};
+  mHQ.forEach((h,i)=>{if(h)mIQ[String(h).trim()]=i});
+  const comboParents=new Set();
+  const prodCol=mIQ['Producto']??0;
+  for(let r=1;r<mAQ.length;r++){
+    const p=String(mAQ[r][prodCol]||'').trim();
+    if(p)comboParents.add(p);
+  }
+
+  // ADICIONES
+  const aA=XLSX.utils.sheet_to_json(wb.Sheets['Adiciones'],{header:1,raw:true,defval:''});
+  const aH=aA[0]||[];const aI={};
+  aH.forEach((h,i)=>{if(h)aI[String(h).trim()]=i});
+  const prodMap=new Map();
+  const oPQ=new Map();// orderId -> prodQty (excluye promos — sus componentes se cuentan en Modificadores)
+
+  function addP(name,cat,qty,ord,rev=0,unitPrice=0){
+    name=normProdName(name);
+    if(!prodMap.has(name))prodMap.set(name,{name,cat,qty:0,revenue:0,
+      byDate:{},byTurno:{Mediodía:0,Noche:0},byCanal:{Mostrador:0,PedidosYa:0,Delivery:0,Otro:0},_prices:{}});
+    const p=prodMap.get(name);
+    p.qty+=qty;p.revenue+=rev;
+    p.byDate[ord.dateStr]=(p.byDate[ord.dateStr]||0)+qty;
+    if(ord.turno)p.byTurno[ord.turno]=(p.byTurno[ord.turno]||0)+qty;
+    if(ord.canal)p.byCanal[ord.canal]=(p.byCanal[ord.canal]||0)+qty;
+    if(unitPrice>0){const pk=Math.round(unitPrice);p._prices[pk]=(p._prices[pk]||0)+qty;}
+  }
+
+  for(let r=1;r<aA.length;r++){
+    const row=aA[r];
+    if(String(row[aI['Cancelada']]||'').trim().toLowerCase()==='si')continue;
+    const oid=String(row[aI['Id. Venta']]||'').trim();if(!orders.has(oid))continue;
+    const ord=orders.get(oid);
+    let prod=String(row[aI['Producto']]||'').trim();
+    prod=normProdName(prod);// normalizar antes de categorizar para que los alias tengan efecto
+    const catRaw=String(row[aI['Categoría']]||'').trim();
+    const qty=parseFloat(row[aI['Cantidad']])||0;
+    const precio=parseFloat(row[aI['Precio']])||0;
+    if(catRaw==='ENVIO'||catRaw==='Envío'){
+      // Track free deliveries
+      if(/envio\s*gratis/i.test(prod))enviosSinCargo++;
+      else if(!costoEnviosIds.has(oid)&&precio>0)ingresoEnvioAdic+=precio;
+      continue;
+    }
+    if(/envio\s*gratis/i.test(prod))enviosSinCargo++;
+    // Detectar categoría — [Pedidos Ya] puede contener combos O productos individuales
+    let cat;
+    if(isExclude(prod))continue;
+    if(catRaw==='Pedidos Ya'){
+      cat=(comboParents.has(prod)&&!isNeverPromo(prod))?'Promos':inferPYCat(prod);
+    }else if(CAT_MAP.hasOwnProperty(catRaw)){
+      cat=CAT_MAP[catRaw];
+    }else{
+      // Categoría Fudo desconocida: intentar inferir por nombre
+      if(isForcePromo(prod))cat='Promos';
+      else if(/cajita/i.test(prod))cat='Menú Infantil';
+      else if(/malbec|cabernet|vino\b|espumante|champagne|tintas|torront[eé]s|pinot|syrah|bonarda|tempranillo/i.test(prod))cat='Bebidas — Vinos';
+      else cat='Otros';
+    }
+    // Override por nombre de producto — tiene prioridad sobre categoría Fudo
+    if(cat!==null){
+      if(/cajita/i.test(prod))cat='Menú Infantil';
+      else if(/malbec|cabernet|vino\b|espumante|champagne|tintas|torront[eé]s|pinot|syrah|bonarda|tempranillo/i.test(prod))cat='Bebidas — Vinos';
+      else if(!/(^\d+\s*empanada|pack\s*\d|\bpromo\b|\+\s*\d+\s*gratis)/i.test(prod)&&(/empanada.*al horno|al horno|horneada\b/i.test(prod)||(/empanada/i.test(prod)&&/frita/i.test(prod))||/\bH$/.test(prod.trim())||/\bF$/.test(prod.trim()))){
+        if(/frita|\bF$/.test(prod.trim()))cat='Empanadas Fritas';
+        else cat='Empanadas Horno';
+      }
+    }
+    if(cat===null)continue;
+    // precio = total de la línea en Fudo; dividimos por qty para obtener precio unitario
+    const unitPrecio=qty>0?precio/qty:0;
+    addP(prod,cat||'Otros',qty,ord,precio,unitPrecio);
+    // NO contar promos en oPQ — sus componentes se contarán en Modificadores (evita doble conteo)
+    if(cat!=='Promos'){
+      oPQ.set(oid,(oPQ.get(oid)||0)+qty);
+    }
+  }
+
+  // MODIFICADORES (reusa mAQ ya parseado, construye índice completo)
+  const mA=mAQ;
+  const mH=mHQ;const mI=mIQ;
+  const cajitaMap=new Map();// adicionId -> {oid, empanadas, extras, bebida, regalo}
+  for(let r=1;r<mA.length;r++){
+    const row=mA[r];
+    if(String(row[mI['Cancelada']]||'').trim().toLowerCase()==='si')continue;
+    const oid=String(row[mI['Id. Venta']]||'').trim();if(!orders.has(oid))continue;
+    const ord=orders.get(oid);
+    const mod=String(row[mI['Modificador']]||'').trim();
+    const grupo=String(row[mI['Grupo modificador']]||'').trim();
+    let qty=parseFloat(row[mI['Cantidad']])||0;
+    // Cajita Criolla: recolectar por Id. Adición
+    const prodNom=String(row[mI['Producto']]||'').trim();
+    if(prodNom.toLowerCase().includes('cajita')){
+      const aid=String(row[mI['Id. Adición']]||'').trim();
+      if(!cajitaMap.has(aid))cajitaMap.set(aid,{oid,empanadas:{},extras:{},bebida:'',regalo:''});
+      const cj=cajitaMap.get(aid);
+      const modNorm=mod.replace(/\s*-\s*INFANTIL$/i,'').trim();
+      const grupoL=grupo.toLowerCase();
+      if(grupoL.includes('empanadas'))cj.empanadas[modNorm]=(cj.empanadas[modNorm]||0)+qty;
+      else if(grupoL.includes('extra'))cj.extras[modNorm]=(cj.extras[modNorm]||0)+qty;
+      else if(grupoL.includes('bebida'))cj.bebida=modNorm;
+      else if(grupoL.includes('regalo'))cj.regalo=modNorm;
+      continue;
+    }
+    if(grupo==='Pizza por mitades')qty*=0.5;
+    if(/envio\s*gratis/i.test(mod))enviosSinCargo++;
+    const cat=getModCat(mod,grupo);if(!cat)continue;
+    addP(mod,cat,qty,ord);
+    oPQ.set(oid,(oPQ.get(oid)||0)+qty);
+  }
+  // Agregar cajitas vendidas como producto en la categoría Menú Infantil
+  const cajitaData={total:0,byDate:{},empanadas:{},extras:{},bebidas:{},regalos:{},combos:{}};
+  for(const[,cj]of cajitaMap){
+    cajitaData.total++;
+    const ord2=orders.get(cj.oid);
+    const dt=ord2?.dateStr||'';
+    cajitaData.byDate[dt]=(cajitaData.byDate[dt]||0)+1;
+    for(const[s,q]of Object.entries(cj.empanadas))cajitaData.empanadas[s]=(cajitaData.empanadas[s]||0)+q;
+    for(const[s,q]of Object.entries(cj.extras))cajitaData.extras[s]=(cajitaData.extras[s]||0)+q;
+    if(cj.bebida)cajitaData.bebidas[cj.bebida]=(cajitaData.bebidas[cj.bebida]||0)+1;
+    if(cj.regalo)cajitaData.regalos[cj.regalo]=(cajitaData.regalos[cj.regalo]||0)+1;
+    const cs=Object.entries(cj.empanadas).sort((a,b)=>a[0].localeCompare(b[0])).map(([s,q])=>`${q>1?q+'× ':''}${s}`).join(' · ');
+    if(cs)cajitaData.combos[cs]=(cajitaData.combos[cs]||0)+1;
+  }
+
+  // PAGOS
+  const pA=XLSX.utils.sheet_to_json(wb.Sheets['Pagos'],{header:1,raw:true,defval:''});
+  const pH=pA[0]||[];const pI={};
+  pH.forEach((h,i)=>{if(h)pI[String(h).trim()]=i});
+  const payMap={};
+  for(let r=1;r<pA.length;r++){
+    const row=pA[r];
+    if(String(row[pI['Cancelado']]||'').trim().toLowerCase()==='si')continue;
+    const oid=String(row[pI['Id. Venta']]||'').trim();if(!orders.has(oid))continue;
+    const method=normPay(String(row[pI['Medio de Pago']]||'').trim());
+    const monto=parseFloat(row[pI['Monto']])||0;
+    payMap[method]=(payMap[method]||0)+monto;
+  }
+
+  // AGGREGATE
+  const ordList=Array.from(orders.values());
+  const totalPedidos=ordList.length;
+  const totalVentas=ordList.reduce((s,o)=>s+o.total,0);
+  const totalProductos=Array.from(oPQ.values()).reduce((s,v)=>s+v,0);
+
+  // Canal
+  const canal={Mostrador:{ped:0,ven:0,prod:0},PedidosYa:{ped:0,ven:0,prod:0},Delivery:{ped:0,ven:0,prod:0}};
+  for(const o of ordList)if(canal[o.canal]){canal[o.canal].ped++;canal[o.canal].ven+=o.total}
+  for(const p of prodMap.values())for(const[c,q]of Object.entries(p.byCanal))if(canal[c])canal[c].prod+=q;
+
+  // byDate
+  const byDate={};
+  for(const o of ordList){
+    if(!byDate[o.dateStr])byDate[o.dateStr]=mkBD();
+    const d=byDate[o.dateStr];
+    d.ped++;d.ven+=o.total;
+    if(o.canal==='Mostrador')d.mos++;
+    if(o.canal==='PedidosYa')d.py++;
+    if(o.canal==='Delivery')d.del++;
+    if(o.turno&&d.td[o.turno]){
+      const t=d.td[o.turno];t.ped++;t.ven+=o.total;
+      if(o.canal==='Mostrador')t.mos++;
+      if(o.canal==='PedidosYa')t.py++;
+      if(o.canal==='Delivery')t.del++;
+    }
+  }
+  for(const p of prodMap.values())
+    for(const[dt,q]of Object.entries(p.byDate))
+      if(byDate[dt])byDate[dt].prod+=q;
+
+  // byTurno
+  const byTurno={Mediodía:{ped:0,ven:0,mos:0,py:0,del:0,prod:0,days:new Set()},
+                  Noche:{ped:0,ven:0,mos:0,py:0,del:0,prod:0,days:new Set()}};
+  for(const o of ordList){
+    if(!o.turno||!byTurno[o.turno])continue;
+    const bt=byTurno[o.turno];
+    bt.ped++;bt.ven+=o.total;bt.days.add(o.dateStr);
+    if(o.canal==='Mostrador')bt.mos++;
+    if(o.canal==='PedidosYa')bt.py++;
+    if(o.canal==='Delivery')bt.del++;
+  }
+  for(const p of prodMap.values())
+    for(const[t,q]of Object.entries(p.byTurno))
+      if(byTurno[t])byTurno[t].prod+=q;
+
+  // Empleados y repartidores (repartidores tienen "- " al inicio del nombre en Fudo)
+  const empMap={};const repMap={};
+  for(const o of ordList){
+    const isRep=o.emp.startsWith('- ');
+    const dispName=isRep?o.emp.slice(2).trim():o.emp;
+    const target=isRep?repMap:empMap;
+    if(!target[dispName])target[dispName]={ped:0,ven:0,prod:0};
+    target[dispName].ped++;
+    target[dispName].ven+=o.total;
+    target[dispName].prod+=oPQ.get(o.id)||0;
+  }
+
+  // Vendedores (columna "Cerrada por")
+  const vendMap={};
+  for(const o of ordList){
+    const v=o.vend||'Sin asignar';
+    if(!vendMap[v])vendMap[v]={ped:0,ven:0,prod:0};
+    vendMap[v].ped++;
+    vendMap[v].ven+=o.total;
+    vendMap[v].prod+=oPQ.get(o.id)||0;
+  }
+
+  // DESCUENTOS
+  const discounts=[];
+  if(wb.Sheets['Descuentos']){
+    const dscA=XLSX.utils.sheet_to_json(wb.Sheets['Descuentos'],{header:1,raw:true,defval:''});
+    const dscH=dscA[0]||[];const dscI={};
+    dscH.forEach((h,i)=>{if(h)dscI[String(h).trim()]=i});
+    const idCol=dscI['Id. Venta']??dscI['Id Venta']??dscI['ID Venta'];
+    const nmCol=dscI['Nombre Descuento']??dscI['NOMBRE DESCUENTO']??dscI['Nombre de descuento']??dscI['Nombre']??dscI['Descuento'];
+    const mnCol=dscI['Valor']??dscI['VALOR']??dscI['Monto']??dscI['Importe'];
+    for(let r=1;r<dscA.length;r++){
+      const row=dscA[r];
+      const oidRaw=idCol!=null?row[idCol]:null;
+      const oidKey=oidRaw!=null?String(oidRaw).trim():null;
+      let nombre=nmCol!=null?String(row[nmCol]||'').trim():'';
+      const monto=mnCol!=null?parseFloat(row[mnCol])||0:0;
+      // Skip truly empty rows
+      if(!oidKey&&!nombre&&!monto)continue;
+      const ord=oidKey&&orders.has(oidKey)?orders.get(oidKey):null;
+      const esMenuOnline=oidKey?menuOnlineIds.has(oidKey):false;
+      if(esMenuOnline){
+        nombre='Menú Online';
+      }else if(!nombre){
+        if(ord?.canal==='PedidosYa')nombre='Pedidos Ya';
+        else nombre='Sin identificar';
+      }
+      discounts.push({fecha:ord?.dateStr||'',nombre,monto,canal:ord?.canal||'—',origen:esMenuOnline?'Menú Online':(ord?.origen||'')});
+    }
+  }
+
+  // Period
+  const dates=Object.keys(byDate).sort();
+  const period=dates.length?`${fmD(dates[0])} — ${fmD(dates[dates.length-1])}`:'';
+  const uniqueDays=dates.length||1;
+
+  // Serialize byTurno
+  const btSer={
+    Mediodía:{...byTurno.Mediodía,dayCount:byTurno.Mediodía.days.size},
+    Noche:{...byTurno.Noche,dayCount:byTurno.Noche.days.size}
   };
+  delete btSer.Mediodía.days;delete btSer.Noche.days;
 
-  // ---------- server bridge (fetch a la API de Apps Script) ----------
-  function apiConfigured(){
-    return API_URL && API_URL.indexOf("PEGAR_ACA") === -1;
+  const products=Array.from(prodMap.values()).map(p=>({...p,cost:lookupCost(p.name,costs,edName,edCost)}));
+
+  const enviosCobrados=costoEnviosIds.size;// IDs únicos en hoja CE
+  const deliveryStats={
+    ingresosEnvio:ingresoCE+ingresoEnvioAdic,
+    ingresoCE,
+    ingresoEnvioAdic,
+    enviosSinCargo,
+    enviosCobrados,
+    ceColName:typeof ceColName!=='undefined'?ceColName:'n/a'
+  };
+  return{name,period,uniqueDays,totalVentas,totalPedidos,totalProductos,
+    ticketProm:totalPedidos?totalVentas/totalPedidos:0,
+    prodPorTicket:totalPedidos?totalProductos/totalPedidos:0,
+    canal,products,byDate,byTurno:btSer,payMap,empMap,repMap,vendMap,discounts,deliveryStats,cajitaData};
+}
+
+// ======== BUILD GLOBAL ========
+function buildGlobal(locals){
+  const G={name:'Global',period:'',uniqueDays:0,totalVentas:0,totalPedidos:0,totalProductos:0,
+    canal:{Mostrador:{ped:0,ven:0,prod:0},PedidosYa:{ped:0,ven:0,prod:0},Delivery:{ped:0,ven:0,prod:0}},
+    products:new Map(),byDate:{},
+    byTurno:{Mediodía:{ped:0,ven:0,mos:0,py:0,del:0,prod:0,dayCount:0},Noche:{ped:0,ven:0,mos:0,py:0,del:0,prod:0,dayCount:0}},
+    payMap:{},empMap:{},repMap:{},vendMap:{},discounts:[],
+    deliveryStats:{ingresosEnvio:0,ingresoCE:0,ingresoEnvioAdic:0,enviosSinCargo:0,enviosCobrados:0,ceColName:'n/a'}};
+
+  for(const L of locals){
+    G.totalVentas+=L.totalVentas;G.totalPedidos+=L.totalPedidos;G.totalProductos+=L.totalProductos;
+    G.uniqueDays+=L.uniqueDays;
+    if(!G.period)G.period=L.period;
+    for(const[c,v]of Object.entries(L.canal)){G.canal[c].ped+=v.ped;G.canal[c].ven+=v.ven;G.canal[c].prod+=v.prod}
+    for(const p of L.products){
+      if(!G.products.has(p.name))G.products.set(p.name,{name:p.name,cat:p.cat,qty:0,revenue:0,
+        byDate:{},byTurno:{Mediodía:0,Noche:0},byCanal:{Mostrador:0,PedidosYa:0,Delivery:0,Otro:0},cost:p.cost,_prices:{}});
+      const gp=G.products.get(p.name);
+      gp.qty+=p.qty;gp.revenue+=p.revenue;
+      for(const[d,q]of Object.entries(p.byDate))gp.byDate[d]=(gp.byDate[d]||0)+q;
+      for(const[t,q]of Object.entries(p.byTurno))gp.byTurno[t]=(gp.byTurno[t]||0)+q;
+      for(const[c,q]of Object.entries(p.byCanal))gp.byCanal[c]=(gp.byCanal[c]||0)+q;
+      for(const[pk,q]of Object.entries(p._prices||{}))gp._prices[pk]=(gp._prices[pk]||0)+(+q||0);
+      if(gp.cost==null)gp.cost=p.cost;
+    }
+    for(const[d,v]of Object.entries(L.byDate)){
+      if(!G.byDate[d])G.byDate[d]=mkBD();
+      const gd=G.byDate[d];
+      gd.ped+=v.ped;gd.ven+=v.ven;gd.mos+=v.mos;gd.py+=v.py;gd.del+=v.del;gd.prod+=v.prod;
+      for(const t of['Mediodía','Noche']){
+        gd.td[t].ped+=v.td[t].ped;gd.td[t].ven+=v.td[t].ven;
+        gd.td[t].mos+=v.td[t].mos;gd.td[t].py+=v.td[t].py;gd.td[t].del+=v.td[t].del;
+      }
+    }
+    for(const[t,v]of Object.entries(L.byTurno)){
+      G.byTurno[t].ped+=v.ped;G.byTurno[t].ven+=v.ven;G.byTurno[t].prod+=v.prod;
+      G.byTurno[t].mos+=v.mos;G.byTurno[t].py+=v.py;G.byTurno[t].del+=v.del;
+      G.byTurno[t].dayCount+=v.dayCount;
+    }
+    for(const[m,a]of Object.entries(L.payMap))G.payMap[m]=(G.payMap[m]||0)+a;
+    for(const[e,v]of Object.entries(L.empMap||{})){
+      if(!G.empMap[e])G.empMap[e]={ped:0,ven:0,prod:0};
+      G.empMap[e].ped+=v.ped;G.empMap[e].ven+=v.ven;G.empMap[e].prod+=v.prod;
+    }
+    for(const[e,v]of Object.entries(L.repMap||{})){
+      if(!G.repMap[e])G.repMap[e]={ped:0,ven:0,prod:0};
+      G.repMap[e].ped+=v.ped;G.repMap[e].ven+=v.ven;G.repMap[e].prod+=v.prod;
+    }
+    for(const[e,v]of Object.entries(L.vendMap||{})){
+      if(!G.vendMap[e])G.vendMap[e]={ped:0,ven:0,prod:0};
+      G.vendMap[e].ped+=v.ped;G.vendMap[e].ven+=v.ven;G.vendMap[e].prod+=v.prod;
+    }
+    G.discounts=[...G.discounts,...(L.discounts||[])];
+    if(L.cajitaData){
+      if(!G.cajitaData)G.cajitaData={total:0,byDate:{},empanadas:{},extras:{},bebidas:{},regalos:{},combos:{}};
+      const gc=G.cajitaData,lc=L.cajitaData;
+      gc.total+=(lc.total||0);
+      for(const[d,v]of Object.entries(lc.byDate||{}))gc.byDate[d]=(gc.byDate[d]||0)+v;
+      for(const[s,v]of Object.entries(lc.empanadas||{}))gc.empanadas[s]=(gc.empanadas[s]||0)+v;
+      for(const[s,v]of Object.entries(lc.extras||{}))gc.extras[s]=(gc.extras[s]||0)+v;
+      for(const[s,v]of Object.entries(lc.bebidas||{}))gc.bebidas[s]=(gc.bebidas[s]||0)+v;
+      for(const[s,v]of Object.entries(lc.regalos||{}))gc.regalos[s]=(gc.regalos[s]||0)+v;
+      for(const[s,v]of Object.entries(lc.combos||{}))gc.combos[s]=(gc.combos[s]||0)+v;
+    }
+    const ds=L.deliveryStats||{};
+    G.deliveryStats.ingresosEnvio=addN(G.deliveryStats.ingresosEnvio,ds.ingresosEnvio);
+    G.deliveryStats.ingresoCE=addN(G.deliveryStats.ingresoCE,ds.ingresoCE);
+    G.deliveryStats.ingresoEnvioAdic=addN(G.deliveryStats.ingresoEnvioAdic,ds.ingresoEnvioAdic);
+    G.deliveryStats.enviosSinCargo=addN(G.deliveryStats.enviosSinCargo,ds.enviosSinCargo);
+    G.deliveryStats.enviosCobrados=addN(G.deliveryStats.enviosCobrados,ds.enviosCobrados);
+  }
+  G.products=Array.from(G.products.values());
+  G.ticketProm=G.totalPedidos?G.totalVentas/G.totalPedidos:0;
+  G.prodPorTicket=G.totalPedidos?G.totalProductos/G.totalPedidos:0;
+  return G;
+}
+
+// ======== DOW AGGREGATION ========
+function getDOWStats(byDate){
+  const res={};
+  for(const nm of DOW)res[nm]={days:0,ped:0,ven:0,mos:0,py:0,del:0,prod:0,
+    td:{Mediodía:{ped:0,ven:0,mos:0,py:0,del:0},Noche:{ped:0,ven:0,mos:0,py:0,del:0}}};
+  for(const[ds,v]of Object.entries(byDate)){
+    const nm=DOW[getDOWi(ds)];const r=res[nm];
+    r.days++;r.ped+=v.ped;r.ven+=v.ven;r.mos+=v.mos;r.py+=v.py;r.del+=v.del;r.prod+=v.prod;
+    for(const t of['Mediodía','Noche']){
+      r.td[t].ped+=v.td[t].ped;r.td[t].ven+=v.td[t].ven;
+      r.td[t].mos+=v.td[t].mos;r.td[t].py+=v.td[t].py;r.td[t].del+=v.td[t].del;
+    }
+  }
+  return res;
+}
+
+// ======== LIST PRICE (mode price from Adiciones) ========
+function listPrice(p){
+  if(!p._prices)return null;
+  const entries=Object.entries(p._prices);
+  if(!entries.length)return null;
+  let best=null,bestQ=0;
+  for(const[pk,q]of entries){if(+q>bestQ){bestQ=+q;best=+pk}}
+  return best;
+}
+
+// ======== DELIVERY TABLERO CALC (static — computed on render from appData.deliveryInputs) ========
+
+// ======== REPARTIDORES CALC (called from onchange handlers) ========
+let _repTotal=0;
+function calcRep(){
+  document.querySelectorAll('[data-rep]').forEach(inp=>{
+    const ped=+inp.dataset.ped||0;
+    const hs=parseFloat(inp.value)||0;
+    const safe=inp.dataset.safe;
+    const eEl=document.getElementById('rep-eph-'+safe);
+    if(eEl)eEl.textContent=hs>0?fmN(ped/hs,2)+' ent/h':'—';
+  });
+}
+
+// ======== SORT PRODUCTS ========
+// Enriquece el nombre del producto con el sabor de Edición Limitada si aplica
+function elLabel(name){
+  const sabor=getActivePd()?.elSabor||appData?.elSabor||'';
+  if(sabor&&/edici[oó]n\s*limitada/i.test(name)){
+    return`${name} <span style="background:#FFF3E0;color:#7A3A00;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;border:1px solid #F68B30;white-space:nowrap">${sabor}</span>`;
+  }
+  return name;
+}
+function sortedProds(products){
+  return[...products].sort((a,b)=>{
+    const oa=CAT_ORDER.indexOf(a.cat),ob=CAT_ORDER.indexOf(b.cat);
+    if(oa!==ob)return(oa<0?99:oa)-(ob<0?99:ob);
+    return b.qty-a.qty;
+  });
+}
+
+// ======== RENDER RESUMEN ========
+function switchResSub(i){curResSub=i;renderContent();}
+function renderResumen(D,all){
+  // Determinar datos a mostrar en las secciones de detalle
+  const isGlobal=D.name==='Global';
+  // curResSub: 0=Global (sin filtro), 1-3=local index en all[]
+  const SD=isGlobal&&curResSub>0?all[curResSub-1]:D;
+
+  // KPIs del seleccionado
+  let h=`<div class="krow">
+    <div class="kpi"><div class="lbl">Ventas totales</div><div class="val g">${fm$(SD.totalVentas)}</div></div>
+    <div class="kpi"><div class="lbl">Pedidos</div><div class="val">${fmN(SD.totalPedidos,0)}</div></div>
+    <div class="kpi"><div class="lbl">Productos</div><div class="val">${fmN(SD.totalProductos,0)}</div></div>
+    <div class="kpi"><div class="lbl">Ticket promedio</div><div class="val">${fm$(SD.ticketProm)}</div></div>
+    <div class="kpi"><div class="lbl">Prod. / ticket</div><div class="val">${fmN(SD.prodPorTicket,1)}</div></div>
+  </div>`;
+
+  // Selector de local (solo en vista Global) — 3 locales, sin repetir el Global
+  if(isGlobal){
+    h+=`<div style="font-size:11px;font-weight:700;color:var(--GR);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Ver por local</div>`;
+    h+=`<div class="res-locals" style="grid-template-columns:repeat(3,1fr)">`;
+    all.forEach((L,i)=>{
+      h+=`<div class="res-lcard${curResSub===i+1?' sel':''}" onclick="switchResSub(${i+1})">
+        <div class="nm">${L.name}</div>
+        <div class="vv">${fm$(L.totalVentas)}</div>
+        <div class="rr"><span>Pedidos</span><span>${fmN(L.totalPedidos,0)}</span></div>
+        <div class="rr"><span>Productos</span><span>${fmN(L.totalProductos,0)}</span></div>
+      </div>`;
+    });
+    h+=`</div>`;
   }
 
-  function callServer(action, payload){
-    if(!apiConfigured()){
-      return Promise.reject(new Error("Falta configurar API_URL en Index.html con el link de Apps Script."));
-    }
-    // Todo viaja por GET (incluso para guardar/editar): Apps Script redirige
-    // internamente sus respuestas, y ese redirect descarta el "body" de un
-    // POST antes de que llegue al servidor. Mandando todo por GET, con los
-    // datos codificados en la URL, evitamos ese problema por completo.
-    var url = API_URL + "?action=" + encodeURIComponent(action);
-    if(action !== "getData"){
-      url += "&payload=" + encodeURIComponent(JSON.stringify(payload||{}));
-    }
-    return fetch(url, {method:"GET"})
-      .then(function(r){ return r.json(); })
-      .then(checkApiError_);
+  // Canal — tabla con % para las 3 métricas
+  const tp=SD.totalPedidos||1,tv=SD.totalVentas||1,tpr=SD.totalProductos||1;
+  const lbs={Mostrador:'🧍 Mostrador',PedidosYa:'🟡 Pedidos Ya',Delivery:'🛵 Delivery'};
+  h+=`<div class="sec"><div class="st">Canal de venta</div><div class="tw"><table>
+    <tr><th>Canal</th>
+      <th class="r">Pedidos</th><th class="r">%</th>
+      <th class="r">Ventas $</th><th class="r">%</th>
+      <th class="r">Productos</th><th class="r">%</th>
+      <th class="r">Ticket prom.</th></tr>`;
+  for(const c of['Mostrador','PedidosYa','Delivery']){
+    const cv=SD.canal[c];
+    h+=`<tr class="dr"><td style="font-weight:600">${lbs[c]}</td>
+      <td class="r">${fmN(cv.ped,0)}</td><td class="r" style="color:var(--GR)">${fmPct(cv.ped,tp)}</td>
+      <td class="r">${fm$(cv.ven)}</td><td class="r" style="color:var(--GR)">${fmPct(cv.ven,tv)}</td>
+      <td class="r">${fmN(cv.prod,0)}</td><td class="r" style="color:var(--GR)">${fmPct(cv.prod,tpr)}</td>
+      <td class="r">${cv.ped?fm$(cv.ven/cv.ped):'—'}</td>
+    </tr>`;
+  }
+  h+=`</table></div></div>`;
+
+  // Medios de pago + Descuentos (dos columnas)
+  const sortPay=Object.entries(SD.payMap).sort((a,b)=>b[1]-a[1]);
+  const totPay=sortPay.reduce((s,[,v])=>s+v,0)||1;
+  const byDsc={};let totDsc=0;
+  for(const d of(SD.discounts||[])){
+    if(!byDsc[d.nombre])byDsc[d.nombre]={count:0,monto:0};
+    byDsc[d.nombre].count++;byDsc[d.nombre].monto+=d.monto;totDsc+=d.monto;
+  }
+  const sortDsc=Object.entries(byDsc).sort((a,b)=>b[1].monto-a[1].monto);
+
+  h+=`<div class="g2">
+  <div class="sec"><div class="st">Medios de pago</div><div class="tw"><table>
+    <tr><th>Medio</th><th class="r">Monto</th><th class="r">%</th></tr>`;
+  for(const[m,a]of sortPay)
+    h+=`<tr class="dr"><td>${m}</td><td class="r">${fm$(a)}</td><td class="r">${fmPct(a,totPay)}</td></tr>`;
+  h+=`<tr class="subt"><td>TOTAL</td><td class="r">${fm$(totPay)}</td><td class="r">100%</td></tr>
+  </table></div></div>
+
+  <div class="sec"><div class="st">Descuentos aplicados</div>`;
+  if(!sortDsc.length){
+    h+=`<p style="color:var(--GR);padding:10px 0;font-size:12px">Sin descuentos en el período.</p>`;
+  }else{
+    h+=`<div class="tw"><table>
+      <tr><th>Tipo</th><th class="r">Monto</th><th class="r">%</th></tr>`;
+    for(const[nm,v]of sortDsc)
+      h+=`<tr class="dr"><td>${nm}</td><td class="r">${fm$(v.monto)}</td><td class="r">${fmPct(v.monto,totDsc||1)}</td></tr>`;
+    h+=`<tr class="subt"><td>TOTAL</td><td class="r">${fm$(totDsc)}</td><td class="r">100%</td></tr>
+    </table></div>`;
+  }
+  h+=`</div></div>`;
+  return h;
+}
+
+// ======== RENDER VENTAS ========
+function thTip(lbl,tip,cls='r'){return`<th class="${cls} thtt">${lbl}<span class="ii">ⓘ</span><div class="tip">${tip}</div></th>`}
+
+const CAT_COLOR={
+  'Empanadas Horno':        {bg:'#FFF3E0',bdr:'#F68B30',hd:'#7A3A00'},
+  'Empanadas Fritas':       {bg:'#FBE9E7',bdr:'#BF360C',hd:'#6B1A00'},
+  'Empanadas Copetín':      {bg:'#FFF8E1',bdr:'#F9A825',hd:'#6B5000'},
+  'Pizzas':                 {bg:'#EDE7F6',bdr:'#6A1B9A',hd:'#4A0080'},
+  'Postres':                {bg:'#E8F5E9',bdr:'#2E7D32',hd:'#1B4D20'},
+  'Dips':                   {bg:'#FFF8E1',bdr:'#F57F17',hd:'#6B4800'},
+  'Bebidas — Gaseosas':     {bg:'#E3F2FD',bdr:'#1565C0',hd:'#0D3A6E'},
+  'Bebidas — Cervezas':     {bg:'#E8F5E9',bdr:'#1B5E20',hd:'#0A2E0F'},
+  'Bebidas — Vinos':        {bg:'#F3E5F5',bdr:'#6A1B9A',hd:'#3A0060'},
+  'Bebidas — Jugos y Aguas':{bg:'#E0F7FA',bdr:'#006064',hd:'#003A3D'},
+  'Promos':                 {bg:'#F5F5F5',bdr:'#9E9591',hd:'#5A5A5A'},
+  'Menú Infantil':          {bg:'#FCE4EC',bdr:'#E91E63',hd:'#880E4F'},
+  'Otros':                  {bg:'#FAFAFA',bdr:'#BDBDBD',hd:'#616161'},
+};
+
+function renderVentas(D){
+  const allProds=sortedProds(D.products);
+  const prods=allProds.filter(p=>p.cat!=='Promos');
+  const promos=allProds.filter(p=>p.cat==='Promos');
+
+  // Override qty/byDate para Cajita Criolla (usa modificadores validados, excluye falsas de Pedidos Ya)
+  const cajitaValidQ=D.cajitaData?.total||0;
+  const cajitaByDate=D.cajitaData?.byDate||{};
+  for(const p of [...prods,...promos]){
+    p._dq=/cajita/i.test(p.name)&&cajitaValidQ?cajitaValidQ:p.qty;
+    p._bd=/cajita/i.test(p.name)?cajitaByDate:p.byDate;
   }
 
-  function checkApiError_(data){
-    if(data && data.error){ throw new Error(data.error); }
+  // Rank within category
+  const catRk={};
+  for(const p of prods){catRk[p.cat]=(catRk[p.cat]||0)+1;p._rk=catRk[p.cat]}
+
+  // Category totals
+  const catTotQ={};const catTotV={};
+  for(const p of prods){catTotQ[p.cat]=(catTotQ[p.cat]||0)+p._dq;catTotV[p.cat]=(catTotV[p.cat]||0)+p.revenue}
+
+  const hasCost=D.products.some(p=>p.cost!=null);
+  const totQ=D.totalProductos||1;
+  const totV=prods.reduce((s,p)=>s+p.revenue,0)||1;
+  const TOP5_CATS=[];// TOP 5 desactivado
+
+  const thRow=`<tr>
+    ${thTip('#','Ranking por cantidad dentro de la categoría.','c')}
+    ${thTip('Producto','Nombre del producto según Fudo.','').replace('class="r','class="')}
+    ${thTip('Unidades','Cantidad de unidades vendidas en el período.')}
+    ${thTip('Ventas $','Facturación total: unidades × precio de venta.')}
+    ${thTip('Precio de venta','Precio unitario más frecuente al que se vendió el producto (moda del período).')}
+    ${thTip('% facturación','% que representa este producto sobre la facturación total del período.')}
+    ${thTip('Mediodía','Unidades vendidas en turno mediodía.')}
+    ${thTip('Noche','Unidades vendidas en turno noche.')}
+    ${hasCost?thTip('Costo','Costo unitario cargado en la planilla de costos.')+thTip('Margen','(Precio − Costo) ÷ Precio. Margen bruto unitario.'):''}
+  </tr>`;
+
+  // Group by category
+  const groups=[];let lastC='';
+  for(const p of prods){
+    if(p.cat!==lastC){groups.push({cat:p.cat,items:[]});lastC=p.cat;}
+    groups[groups.length-1].items.push(p);
+  }
+
+  let h='';
+
+  for(const {cat,items} of groups){
+    const cc=CAT_COLOR[cat]||CAT_COLOR['Otros'];
+    h+=`<div style="margin-bottom:13px;border-radius:10px;overflow:hidden;border:1px solid ${cc.bdr}33;box-shadow:0 1px 4px rgba(52,23,18,.07)">
+      <div style="background:${cc.bg};padding:10px 15px;display:flex;align-items:center;justify-content:space-between;border-left:4px solid ${cc.bdr}">
+        <div style="font-size:13px;font-weight:700;color:${cc.hd}">${cat}</div>
+        <div style="display:flex;gap:18px;font-size:11px">
+          <span style="color:${cc.hd}99">Unidades: <strong style="color:${cc.hd}">${fmN(catTotQ[cat],1)}</strong></span>
+          <span style="color:${cc.hd}99">Ventas: <strong style="color:${cc.hd}">${fm$(catTotV[cat])}</strong></span>
+          <span style="color:${cc.hd}99">% total: <strong style="color:${cc.hd}">${fmPct(catTotV[cat],totV)}</strong></span>
+        </div>
+      </div>
+      <div class="tw" style="max-height:none"><table>${thRow}`;
+    for(const p of items){
+      const isTop=p._rk<=5&&TOP5_CATS.includes(p.cat);
+      const rowCls='dr'+(isTop?' t5r':'');
+      const avgPx=p.qty?p.revenue/p.qty:0;
+      const marg=p.cost&&avgPx?((avgPx-p.cost)/avgPx*100):null;
+      h+=`<tr class="${rowCls}">
+        <td class="c"><span class="rk${isTop?' t':''}">${p._rk}</span></td>
+        <td>${elLabel(p.name)}</td>
+        <td class="r">${fmN(p._dq,1)}</td>
+        <td class="r">${fm$(p.revenue)}</td>
+        <td class="r">${avgPx?fm$(avgPx):'—'}</td>
+        <td class="r">${fmPct(p._dq,totQ)}</td>
+        <td class="r">${fmN(p.byTurno.Mediodía,1)}</td>
+        <td class="r">${fmN(p.byTurno.Noche,1)}</td>
+        ${hasCost?`<td class="r">${p.cost!=null?fm$(p.cost):'—'}</td><td class="r">${marg!=null?fmN(marg,1)+'%':'—'}</td>`:''}
+      </tr>`;
+    }
+    h+=`</table></div></div>`;
+  }
+
+  // ---- PROMOCIONES ----
+  if(promos.length){
+    const cc=CAT_COLOR['Promos'];
+    let pkRk=0;
+    h+=`<div style="margin-bottom:13px;border-radius:10px;overflow:hidden;border:1px solid ${cc.bdr}33;box-shadow:0 1px 4px rgba(52,23,18,.07)">
+      <div style="background:${cc.bg};padding:10px 15px;border-left:4px solid ${cc.bdr}">
+        <div style="font-size:13px;font-weight:700;color:${cc.hd}">Promociones vendidas</div>
+        <p style="font-size:11px;color:var(--GR);margin-top:3px">Los productos componentes se cuentan en las categorías de arriba. 🟡 = promo de Pedidos Ya sin desglose.</p>
+      </div>
+      <div class="tw" style="max-height:none"><table>${thRow}`;
+    for(const p of promos){
+      pkRk++;
+      const isUT=isUntrack(p.name);
+      const rowCls='dr'+(isUT?' utr':'');
+      const avgPx=p.qty?p.revenue/p.qty:0;
+      h+=`<tr class="${rowCls}">
+        <td class="c"><span class="rk">${pkRk}</span></td>
+        <td>${elLabel(p.name)}${isUT?' <small style="color:#B8860B">🟡 sin desglose</small>':''}</td>
+        <td class="r">${fmN(p.qty,1)}</td>
+        <td class="r">${p.revenue?fm$(p.revenue):'—'}</td>
+        <td class="r">${avgPx?fm$(avgPx):'—'}</td>
+        <td class="r">${fmPct(p.qty,totQ)}</td>
+        <td class="r">${fmN(p.byTurno.Mediodía,1)}</td>
+        <td class="r">${fmN(p.byTurno.Noche,1)}</td>
+        ${hasCost?`<td class="r">—</td><td class="r">—</td>`:''}
+      </tr>`;
+    }
+    h+=`</table></div></div>`;
+  }
+
+  // ---- HEATMAP POR DÍA ----
+  const allDates=Object.keys(D.byDate).sort();
+  const MAX_COLS=31;
+  const showDates=allDates.length>MAX_COLS?allDates.slice(-MAX_COLS):allDates;
+  const truncated=allDates.length>MAX_COLS;
+
+  h+=`<div class="sec">
+    <div class="st">Unidades vendidas por día${truncated?` <small style="font-weight:400;color:var(--GR)">(últimos ${MAX_COLS} días)</small>`:''}</div>
+    ${truncated?`<p class="note" style="margin-bottom:8px">Más de ${MAX_COLS} días — se muestran los últimos. Exportá el JSON para el historial completo.</p>`:''}
+    <div class="tw"><table style="font-size:11px">
+      <tr>
+        <th class="sc1" style="min-width:160px;background:var(--DK);color:var(--CR)">Producto</th>
+        <th class="r sc2" style="min-width:52px;background:var(--DK);color:var(--CR)">Total</th>`;
+  for(const d of showDates){
+    const dow=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'][new Date(d).getDay()];
+    const isSun=dow==='Dom',isSat=dow==='Sáb';
+    const wkColor=(isSun||isSat)?'#F9A825':'var(--CR)';
+    h+=`<th class="c" style="min-width:34px;background:var(--DK);color:var(--CR);font-size:9px;line-height:1.3;padding:3px 2px">${fmD(d).slice(0,5)}<br><span style="color:${wkColor};font-size:8px;font-weight:${(isSun||isSat)?'700':'400'}">${dow}</span></th>`;
+  }
+  h+=`</tr>`;
+
+  const pivotProds=sortedProds(D.products);
+  let lastCatPiv='';let catQty=0;let catByDate={};
+  function emitCatSubtotal(cat,qty,byDate){
+    const cc=CAT_COLOR[cat]||CAT_COLOR['Otros'];
+    let sr=`<tr><td class="sc1" style="background:${cc.bg};color:${cc.hd};font-size:10px;font-weight:700;padding:5px 9px 5px 18px;border-left:3px solid ${cc.bdr};border-top:1px solid ${cc.bdr}55">↳ Total ${cat}</td><td class="r sc2" style="background:${cc.bg};color:${cc.hd};font-weight:700;border-top:1px solid ${cc.bdr}55">${fmN(qty,1)}</td>`;
+    for(const d of showDates){const v=byDate[d]||0;sr+=`<td style="text-align:center;background:${cc.bg};color:${cc.hd};font-weight:700;border-top:1px solid ${cc.bdr}55">${v||''}</td>`;}
+    return sr+`</tr>`;
+  }
+  for(const p of pivotProds){
+    if(p.cat!==lastCatPiv){
+      if(lastCatPiv)h+=emitCatSubtotal(lastCatPiv,catQty,catByDate);
+      const cc=CAT_COLOR[p.cat]||CAT_COLOR['Otros'];
+      h+=`<tr><td colspan="${showDates.length+2}" style="position:sticky;left:0;z-index:1;background:${cc.bg};color:${cc.hd};font-size:10px;font-weight:700;padding:5px 9px;text-transform:uppercase;letter-spacing:.04em;border-left:3px solid ${cc.bdr}">${p.cat}</td></tr>`;
+      lastCatPiv=p.cat;catQty=0;catByDate={};
+    }
+    catQty+=(p._dq||0);
+    for(const d of showDates)catByDate[d]=(catByDate[d]||0)+(p._bd[d]||0);
+    // Heat relative to this product's own max day
+    const rowVals=showDates.map(d=>p._bd[d]||0);
+    const mxV=Math.max(...rowVals,1);
+    h+=`<tr class="dr"><td class="sc1">${elLabel(p.name)}</td><td class="r sc2" style="font-weight:700">${fmN(p._dq,1)}</td>`;
+    for(const d of showDates){
+      const v=p._bd[d]||0;
+      let cs='text-align:center;font-variant-numeric:tabular-nums;font-size:11px;';
+      if(v===0){cs+='color:var(--BD);';}
+      else{
+        const r=v/mxV;
+        if(r>=0.9)cs+=`background:var(--M);color:var(--CR);font-weight:700;`;
+        else if(r>=0.6)cs+=`background:var(--OR);color:#fff;font-weight:600;`;
+        else if(r>=0.3)cs+=`background:var(--T5);color:var(--M);font-weight:500;`;
+        else cs+=`background:var(--UT);color:var(--M);`;
+      }
+      h+=`<td style="${cs}">${v}</td>`;
+    }
+    h+=`</tr>`;
+  }
+  if(lastCatPiv)h+=emitCatSubtotal(lastCatPiv,catQty,catByDate);
+  h+=`<tr class="subt"><td class="sc1">Pedidos del día</td><td class="r sc2">${fmN(D.totalPedidos,0)}</td>`;
+  for(const d of showDates){
+    const v=D.byDate[d]?.ped||0;
+    h+=`<td style="text-align:center">${v}</td>`;
+  }
+  h+=`</tr></table></div>
+  <div class="legend" style="margin-top:8px">
+    <span><span class="dot" style="background:var(--UT);border:1px solid var(--BD)"></span>Bajo</span>
+    <span><span class="dot" style="background:var(--T5)"></span>Medio</span>
+    <span><span class="dot" style="background:var(--OR)"></span>Alto</span>
+    <span><span class="dot" style="background:var(--M)"></span>Pico del producto</span>
+  </div></div>`;
+
+  h+=renderCajita(D);
+  return h;
+}
+
+// ======== RENDER ORIGEN ========
+function renderOrigen(D){
+  const tp=D.totalPedidos||1,tv=D.totalVentas||1,tprod=D.totalProductos||1;
+  const icons={Mostrador:'🧍',PedidosYa:'🟡',Delivery:'🛵'};
+  const lbs={Mostrador:'Mostrador',PedidosYa:'Pedidos Ya',Delivery:'Delivery'};
+  let h=`<div class="cgrid">`;
+  for(const c of['Mostrador','PedidosYa','Delivery']){
+    const cv=D.canal[c];
+    h+=`<div class="ccard">
+      <div class="ch">${icons[c]} ${lbs[c]}</div>
+      <div class="cr"><span class="ck">Pedidos</span><span class="cv">${fmN(cv.ped,0)} <small style="color:var(--GR);font-weight:400">(${fmPct(cv.ped,tp)})</small></span></div>
+      <div class="cr"><span class="ck">Ventas ($)</span><span class="cv">${fm$(cv.ven)} <small style="color:var(--GR);font-weight:400">(${fmPct(cv.ven,tv)})</small></span></div>
+      <div class="cr"><span class="ck">Productos</span><span class="cv">${fmN(cv.prod,0)} <small style="color:var(--GR);font-weight:400">(${fmPct(cv.prod,tprod)})</small></span></div>
+      <div class="cr"><span class="ck">Ticket promedio</span><span class="cv">${cv.ped?fm$(cv.ven/cv.ped):'—'}</span></div>
+      <div class="cr"><span class="ck">Prod. por pedido</span><span class="cv">${cv.ped?fmN(cv.prod/cv.ped,1):'—'}</span></div>
+    </div>`;
+  }
+  h+=`</div>`;
+
+  // Tabla resumen
+  h+=`<div class="sec"><div class="st">Comparativo por origen</div><div class="tw"><table>
+    <tr><th>Canal</th><th class="r">Pedidos</th><th class="r">% Ped.</th><th class="r">Ventas $</th><th class="r">% Ventas</th><th class="r">Productos</th><th class="r">% Prod.</th><th class="r">Ticket prom.</th><th class="r">Prod./ped.</th></tr>`;
+  for(const c of['Mostrador','PedidosYa','Delivery']){
+    const cv=D.canal[c];
+    h+=`<tr class="dr"><td>${lbs[c]}</td>
+      <td class="r">${fmN(cv.ped,0)}</td><td class="r">${fmPct(cv.ped,tp)}</td>
+      <td class="r">${fm$(cv.ven)}</td><td class="r">${fmPct(cv.ven,tv)}</td>
+      <td class="r">${fmN(cv.prod,0)}</td><td class="r">${fmPct(cv.prod,tprod)}</td>
+      <td class="r">${cv.ped?fm$(cv.ven/cv.ped):'—'}</td>
+      <td class="r">${cv.ped?fmN(cv.prod/cv.ped,1):'—'}</td>
+    </tr>`;
+  }
+  const totC=Object.values(D.canal).reduce((s,v)=>({ped:s.ped+v.ped,ven:s.ven+v.ven,prod:s.prod+v.prod}),{ped:0,ven:0,prod:0});
+  h+=`<tr class="subt"><td>TOTAL</td>
+    <td class="r">${fmN(totC.ped,0)}</td><td class="r">100%</td>
+    <td class="r">${fm$(totC.ven)}</td><td class="r">100%</td>
+    <td class="r">${fmN(totC.prod,0)}</td><td class="r">100%</td>
+    <td class="r">${totC.ped?fm$(totC.ven/totC.ped):'—'}</td>
+    <td class="r">${totC.ped?fmN(totC.prod/totC.ped,1):'—'}</td>
+  </tr></table></div></div>`;
+  return h;
+}
+
+// ======== RENDER PROMEDIOS ========
+function renderPromedios(D){
+  const dow=getDOWStats(D.byDate);
+  const abr=DOW.map(n=>n.slice(0,3).toUpperCase());// LUN MAR MIÉ...
+  const cols=DOW.length+1;
+
+  // Fila normal
+  function metRow(lbl,fn,bold=true){
+    let r=`<tr class="dr"><td style="font-weight:${bold?600:500};white-space:nowrap">${lbl}</td>`;
+    for(const nm of DOW){const d=dow[nm];r+=`<td class="r">${fn(d)}</td>`}
+    return r+`</tr>`;
+  }
+  // Sub-fila canal (indentada, gris) bajo Pedidos
+  function canalRow(lbl,fn){
+    let r=`<tr class="dr" style="background:#fafafa"><td style="font-weight:500;white-space:nowrap;padding-left:20px;color:var(--GR);font-size:11px">↳ ${lbl}</td>`;
+    for(const nm of DOW){const d=dow[nm];r+=`<td class="r" style="color:var(--GR);font-size:11px">${fn(d)}</td>`}
+    return r+`</tr>`;
+  }
+  // Separador "por canal"
+  const canalSep=`<tr><td colspan="${cols}" style="font-size:10px;color:var(--GR);padding:3px 9px 3px 14px;background:var(--GL);border-top:1px solid var(--BD);letter-spacing:.3px;text-transform:uppercase">por canal</td></tr>`;
+
+  // Tabla total — días como columnas
+  let h=`<div class="sec"><div class="st">Promedio por día de semana — Total</div>
+  <div class="tw"><table>
+    <tr><th style="min-width:110px">Métrica</th>`;
+  DOW.forEach((nm,i)=>{const d=dow[nm];h+=`<th class="r" style="min-width:52px">${abr[i]}<br><span style="font-weight:400;font-size:9px;color:var(--GR)">${d.days} sem</span></th>`});
+  h+=`</tr>`;
+  h+=metRow('Pedidos',d=>{const n=d.days||1;return fmN(d.ped/n,1)});
+  h+=canalSep;
+  h+=canalRow('Mostrador',d=>{const n=d.days||1;return fmN(d.mos/n,1)});
+  h+=canalRow('Pedidos Ya',d=>{const n=d.days||1;return fmN(d.py/n,1)});
+  h+=canalRow('Delivery',d=>{const n=d.days||1;return fmN(d.del/n,1)});
+  h+=metRow('Productos',d=>{const n=d.days||1;return fmN(d.prod/n,1)});
+  h+=metRow('Ventas $',d=>{const n=d.days||1;return fm$(d.ven/n)});
+  h+=`</table></div></div>`;
+
+  // Por turno — días como columnas
+  h+=`<div class="g2">`;
+  for(const turno of['Mediodía','Noche']){
+    h+=`<div class="sec"><div class="st">Promedio por día — ${turno}</div>
+    <div class="tw"><table>
+      <tr><th style="min-width:90px">Métrica</th>`;
+    DOW.forEach((nm,i)=>{h+=`<th class="r" style="min-width:44px">${abr[i]}</th>`});
+    h+=`</tr>`;
+    const mt=(lbl,fn,bold=true)=>{
+      let r=`<tr class="dr"><td style="font-weight:${bold?600:500};white-space:nowrap">${lbl}</td>`;
+      for(const nm of DOW){const d=dow[nm];const n=d.days||1;const dt=d.td[turno];r+=`<td class="r">${fn(dt,n)}</td>`}
+      return r+`</tr>`;
+    };
+    const mtsub=(lbl,fn)=>{
+      let r=`<tr class="dr" style="background:#fafafa"><td style="font-weight:500;white-space:nowrap;padding-left:20px;color:var(--GR);font-size:11px">↳ ${lbl}</td>`;
+      for(const nm of DOW){const d=dow[nm];const n=d.days||1;const dt=d.td[turno];r+=`<td class="r" style="color:var(--GR);font-size:11px">${fn(dt,n)}</td>`}
+      return r+`</tr>`;
+    };
+    const tCols=DOW.length+1;
+    const tSep=`<tr><td colspan="${tCols}" style="font-size:10px;color:var(--GR);padding:3px 9px 3px 14px;background:var(--GL);border-top:1px solid var(--BD);letter-spacing:.3px;text-transform:uppercase">por canal</td></tr>`;
+    h+=mt('Pedidos',(dt,n)=>fmN(dt.ped/n,1));
+    h+=tSep;
+    h+=mtsub('Mostrador',(dt,n)=>fmN(dt.mos/n,1));
+    h+=mtsub('Pedidos Ya',(dt,n)=>fmN(dt.py/n,1));
+    h+=mtsub('Delivery',(dt,n)=>fmN(dt.del/n,1));
+    h+=mt('Ventas $',(dt,n)=>fm$(dt.ven/n));
+    h+=`</table></div></div>`;
+  }
+  h+=`</div>`;
+
+  // Resumen por turno
+  h+=`<div class="sec"><div class="st">Resumen por turno — período completo</div>
+  <div class="tw"><table>
+    <tr><th>Turno</th><th class="r">Días c/actividad</th><th class="r">Pedidos/día</th><th class="r">Prod./día</th><th class="r">Ventas/día</th><th class="r">Mostr./día</th><th class="r">PY/día</th><th class="r">Del./día</th></tr>`;
+  for(const[t,v]of Object.entries(D.byTurno)){
+    const n=v.dayCount||1;
+    h+=`<tr class="dr"><td style="font-weight:600">${t}</td>
+      <td class="r">${v.dayCount}</td>
+      <td class="r">${fmN(v.ped/n,1)}</td>
+      <td class="r">${fmN(v.prod/n,1)}</td>
+      <td class="r">${fm$(v.ven/n)}</td>
+      <td class="r">${fmN(v.mos/n,1)}</td>
+      <td class="r">${fmN(v.py/n,1)}</td>
+      <td class="r">${fmN(v.del/n,1)}</td>
+    </tr>`;
+  }
+  h+=`</table></div></div>`;
+  return h;
+}
+
+
+// ======== RENDER PAGOS ========
+function renderPagos(D){
+  const sp=Object.entries(D.payMap).sort((a,b)=>b[1]-a[1]);
+  const tot=sp.reduce((s,[,v])=>s+v,0)||1;
+  let h=`<div class="sec"><div class="st">Medios de pago</div><div class="tw"><table>
+    <tr><th>Medio de pago</th><th class="r">Monto ($)</th><th class="r">%</th></tr>`;
+  for(const[m,a]of sp)
+    h+=`<tr class="dr"><td>${m}</td><td class="r">${fm$(a)}</td><td class="r">${fmPct(a,tot)}</td></tr>`;
+  h+=`<tr class="subt"><td>TOTAL</td><td class="r">${fm$(tot)}</td><td class="r">100%</td></tr>`;
+  h+=`</table></div></div>`;
+  return h;
+}
+
+// ======== RENDER VENDEDORES ========
+function renderVendedores(D){
+  const vm=D.vendMap||{};
+  const rows=Object.entries(vm)
+    .map(([nm,v])=>{
+      const ticket=v.ped?v.ven/v.ped:0;
+      const ppt=v.ped?v.prod/v.ped:0;
+      return{nm,ped:v.ped,ven:v.ven,prod:v.prod,ticket,ppt};
+    })
+    .sort((a,b)=>b.ven-a.ven);
+
+  if(!rows.length)return`<div class="sec"><p style="color:var(--GR);padding:16px 0">No hay datos de vendedores. Verificá que la hoja <strong>"Ventas"</strong> tenga la columna <strong>"Cerrada por"</strong>.</p></div>`;
+
+  const totPed=rows.reduce((s,r)=>s+r.ped,0);
+  const totVen=rows.reduce((s,r)=>s+r.ven,0);
+  const totProd=rows.reduce((s,r)=>s+r.prod,0);
+  const totTicket=totPed?totVen/totPed:0;
+  const totPpt=totPed?totProd/totPed:0;
+
+  let h=`<div class="sec"><div class="st">Rendimiento por vendedor — ${D.name}</div>
+  <div class="tw"><table>
+    <tr>
+      ${thTip('Vendedor','Nombre según columna "Cerrada por" en Ventas de Fudo.','').replace('class="r','class="')}
+      ${thTip('Ventas $','Suma de los totales de pedidos cerrados por este vendedor.')}
+      ${thTip('% Ventas','Participación sobre el total de ventas del período.')}
+      ${thTip('Pedidos','Cantidad de pedidos cerrados.')}
+      ${thTip('Productos','Unidades vendidas en los pedidos cerrados por este vendedor.')}
+      ${thTip('Ticket prom.','Ventas $ ÷ Pedidos.')}
+      ${thTip('Prod./ticket','Promedio de productos por pedido.')}
+    </tr>`;
+
+  for(const r of rows){
+    h+=`<tr class="dr">
+      <td style="font-weight:600">${r.nm}</td>
+      <td class="r">${fm$(r.ven)}</td>
+      <td class="r">${fmPct(r.ven,totVen||1)}</td>
+      <td class="r">${fmN(r.ped,0)}</td>
+      <td class="r">${fmN(r.prod,0)}</td>
+      <td class="r">${fm$(r.ticket)}</td>
+      <td class="r">${fmN(r.ppt,1)}</td>
+    </tr>`;
+  }
+
+  h+=`<tr class="subt">
+    <td>TOTAL</td>
+    <td class="r">${fm$(totVen)}</td>
+    <td class="r">100%</td>
+    <td class="r">${fmN(totPed,0)}</td>
+    <td class="r">${fmN(totProd,0)}</td>
+    <td class="r">${fm$(totTicket)}</td>
+    <td class="r">${fmN(totPpt,1)}</td>
+  </tr>
+  </table></div></div>`;
+
+  return h;
+}
+
+// ======== RENDER ENVIOS ========
+function renderEnvios(D){
+  const ds=D.deliveryStats||{};
+  const di=getActivePd()?.deliveryInputs||appData?.deliveryInputs||{};
+  // Botón editar costos (solo visible en vista Global)
+  const editBtn=D.name==='Global'
+    ?`<div style="text-align:right;margin-bottom:10px">
+        <button class="btn-s" onclick="openEditCostos()" style="border-color:var(--OR);color:var(--OR)">✏️ Editar costos de cadetería</button>
+      </div>`
+    :'';
+  const bl=di.byLocal||{};
+  const hayByLocal=Object.keys(bl).length>0;
+
+  function localCost(loc){
+    const cy=loc.cy||0,sq=loc.sq||0,el=loc.el||0;
+    const extCY=loc.extCY||0,extRB=loc.extRB||0,extUB=loc.extUB||0;
+    const tot=cy+sq+el+extCY+extRB+extUB;
+    return{tot,cy,sq,el,extCY,extRB,extUB};
+  }
+
+  let costoTotal=0;
+  if(hayByLocal){
+    if(D.name==='Global'){
+      for(const v of Object.values(bl))costoTotal+=localCost(v).tot;
+    }else{
+      costoTotal=localCost(bl[D.name]||{}).tot;
+    }
+  }
+
+  const enviosPropios=D.canal?.Delivery?.ped||0;
+  const enviosGratis=ds.enviosSinCargo||0;
+  const enviosCobrados=ds.enviosCobrados||0;
+  const ingresosEnvio=ds.ingresosEnvio||0;
+  const ingresoCE=ds.ingresoCE||0;
+  const ingresoAdic=ds.ingresoEnvioAdic||0;
+  const costoRealPorEnvio=enviosPropios>0&&costoTotal>0?Math.round(costoTotal/enviosPropios):0;
+  const costoNetoPorEnvio=enviosPropios>0&&costoTotal>0?Math.round((costoTotal-ingresosEnvio)/enviosPropios):0;
+  const resultado=ingresosEnvio-costoTotal;
+
+  // KPI con tooltip en el label
+  function kpi(lbl,tipTxt,val,sub='',accent='var(--M)'){
+    return`<div class="kpi" style="border-left-color:${accent}">
+      <div class="lbl thtt" style="position:relative">${lbl}<span class="ii">ⓘ</span>
+        <div class="tip" style="font-weight:400;text-transform:none;font-size:11px;letter-spacing:0">${tipTxt}</div></div>
+      <div class="val">${val}</div>
+      ${sub?`<div style="font-size:10px;color:var(--GR);margin-top:4px">${sub}</div>`:''}
+    </div>`;
+  }
+
+  // ── HERO: dos métricas principales ──
+  function heroMetric(lbl,tipTxt,val,sub,col){
+    return`<div style="text-align:center;padding:24px 20px 20px;flex:1;min-width:200px">
+      <div class="thtt" style="display:inline-block;position:relative;font-size:10px;text-transform:uppercase;letter-spacing:.9px;color:var(--GR);margin-bottom:10px;cursor:help">
+        ${lbl}<span class="ii">ⓘ</span>
+        <div class="tip" style="font-weight:400;text-transform:none;font-size:11px;letter-spacing:0;left:0;right:auto;min-width:200px">${tipTxt}</div>
+      </div>
+      <div style="font-size:48px;font-weight:900;line-height:1.05;letter-spacing:-1px;color:${col}">${val}</div>
+      ${sub?`<div style="font-size:11px;color:var(--GR);margin-top:8px">${sub}</div>`:''}
+    </div>`;
+  }
+  const netoColor=costoNetoPorEnvio>0?'#c62828':costoNetoPorEnvio<0?'var(--GN)':'var(--GR)';
+  let h=`<div class="sec" style="margin-bottom:16px;padding:0">
+    <div style="display:flex;align-items:stretch;gap:0;flex-wrap:wrap">
+      ${heroMetric(
+        'Costo real por envío',
+        'Costo operativo total (ingresado al inicio) dividido la cantidad de envíos propios. No descuenta lo cobrado al cliente.',
+        costoRealPorEnvio>0?fm$(costoRealPorEnvio):'—',
+        costoTotal>0&&enviosPropios>0?`${fm$(costoTotal)} ÷ ${fmN(enviosPropios,0)} envíos`:'',
+        costoRealPorEnvio>0?'var(--OR)':'var(--GR)'
+      )}
+      <div style="width:1px;background:var(--BD);margin:20px 0"></div>
+      ${costoTotal>0?heroMetric(
+        'Costo neto por envío',
+        'Lo que te cuesta cada envío una vez descontado lo que cobraste al cliente: (Costo total − Ingresos por envíos) ÷ Envíos propios.',
+        costoNetoPorEnvio!==0?fm$(costoNetoPorEnvio):'—',
+        costoTotal>0&&ingresosEnvio>0?`(${fm$(costoTotal)} − ${fm$(ingresosEnvio)}) ÷ ${fmN(enviosPropios,0)}`:'Sin ingresos registrados',
+        netoColor
+      ):''}
+    </div>
+  </div>`;
+
+  // ── FILA DE MÉTRICAS ──
+  const resTip=resultado>=0
+    ?'El delivery se autofinancia: los ingresos cobrados al cliente cubren el costo operativo.'
+    :'El delivery no se autofinancia: los costos superan los ingresos cobrados al cliente por envío.';
+  h+=`<div class="krow">
+    ${kpi('Ingresos por envíos',
+      `Lo que cobraste al cliente por delivery.<br>
+       <strong>Hoja Fudo "Costos de Envíos"</strong>: ${fm$(ingresoCE)}${ingresoCE===0?` <em>(columna no encontrada — revisá la consola)</em>`:''}<br>
+       <strong>Adiciones categoría Envío</strong>: ${fm$(ingresoAdic)}`,
+      `<span style="color:var(--GN)">${fm$(ingresosEnvio)}</span>`,
+      `CE: ${fm$(ingresoCE)} · Adic: ${fm$(ingresoAdic)}`)}
+    ${kpi('Envíos',
+      'Pedidos del canal <strong>Delivery</strong> en Fudo (estado "Cerrada"), excluyendo Pedidos Ya. Pedidos cancelados no se contabilizan.',
+      fmN(enviosPropios,0),
+      enviosCobrados>0?`cobrados al cliente: ${fmN(enviosCobrados,0)}`:'—')}
+    ${kpi('Envíos gratis',
+      'Pedidos con ítem <em>"Envio Gratis"</em> en Adiciones — sin cargo de delivery al cliente.',
+      fmN(enviosGratis,0),'—')}
+    ${costoTotal>0?kpi('Costo operativo total',
+      'Suma de todos los costos de delivery ingresados al inicio: Cadete Ya, Squad, Elsa y servicios externos por local.',
+      fm$(costoTotal),'','var(--CH)'):''}
+    ${costoTotal>0?kpi('Resultado delivery',
+      resTip,
+      `<span style="color:${resultado>=0?'var(--GN)':'#c62828'}">${fm$(resultado)}</span>`,
+      resultado>=0?'✓ El delivery se paga solo':'✗ Déficit operativo',
+      resultado>=0?'var(--GN)':'#c62828'):''}
+  </div>`;
+
+  // ── DESGLOSE POR TURNO ──
+  const btMed=D.byTurno?.Mediodía||{};
+  const btNoche=D.byTurno?.Noche||{};
+  const delMed=btMed.del||0;
+  const delNoche=btNoche.del||0;
+  const delSinTurno=Math.max(0,enviosPropios-delMed-delNoche);
+  const pyMed=btMed.py||0;
+  const pyNoche=btNoche.py||0;
+  const pyTotal=(D.canal?.PedidosYa?.ped||0);
+  const pySTurno=Math.max(0,pyTotal-pyMed-pyNoche);
+  if(enviosPropios>0){
+    h+=`<div class="sec"><div class="st">Envíos por turno</div>
+    <div class="tw"><table>
+      <tr>
+        <th>Turno</th>
+        ${thTip('Delivery','Pedidos del canal Delivery (propios) en este turno.')}
+        ${thTip('% Delivery','Participación sobre el total de envíos propios.')}
+        ${thTip('Pedidos Ya','Pedidos del canal Pedidos Ya en este turno (referencia).')}
+        ${thTip('% PY','Participación sobre el total de Pedidos Ya.')}
+      </tr>`;
+    const rows=[
+      {t:'Mediodía',del:delMed,py:pyMed},
+      {t:'Noche',del:delNoche,py:pyNoche},
+      ...(delSinTurno>0||pySTurno>0?[{t:'Sin turno asignado',del:delSinTurno,py:pySTurno}]:[])
+    ];
+    for(const r of rows){
+      h+=`<tr class="dr">
+        <td style="font-weight:600">${r.t}</td>
+        <td class="r">${fmN(r.del,0)}</td>
+        <td class="r">${enviosPropios?fmPct(r.del,enviosPropios):'—'}</td>
+        <td class="r" style="color:var(--GR)">${fmN(r.py,0)}</td>
+        <td class="r" style="color:var(--GR)">${pyTotal?fmPct(r.py,pyTotal):'—'}</td>
+      </tr>`;
+    }
+    h+=`<tr class="subt"><td>TOTAL</td>
+      <td class="r">${fmN(enviosPropios,0)}</td><td class="r">100%</td>
+      <td class="r" style="color:var(--GR)">${fmN(pyTotal,0)}</td>
+      <td class="r" style="color:var(--GR)">100%</td>
+    </tr></table></div></div>`;
+  }
+
+  // ── DESGLOSE POR LOCAL ──
+  if(D.name==='Global'&&hayByLocal){
+    h+=`<div class="sec"><div class="st">Desglose de costos por local</div><div class="tw"><table>
+      <tr>
+        <th>Local</th>
+        <th class="r">Cadete Ya</th>
+        <th class="r">Squad</th>
+        <th class="r">Elsa</th>
+        <th class="r">Viajes CY</th>
+        <th class="r">Rapiboy</th>
+        <th class="r">Uber Env.</th>
+        <th class="r">Total</th>
+      </tr>`;
+    let sumTot=0;
+    for(const[loc,v]of Object.entries(bl)){
+      const c=localCost(v);sumTot+=c.tot;
+      h+=`<tr class="dr"><td style="font-weight:600">${loc}</td>
+        <td class="r">${c.cy>0?fm$(c.cy):'—'}</td>
+        <td class="r">${c.sq>0?fm$(c.sq):'—'}</td>
+        <td class="r">${c.el>0?fm$(c.el):'—'}</td>
+        <td class="r">${c.extCY>0?fm$(c.extCY):'—'}</td>
+        <td class="r">${c.extRB>0?fm$(c.extRB):'—'}</td>
+        <td class="r">${c.extUB>0?fm$(c.extUB):'—'}</td>
+        <td class="r" style="font-weight:600">${fm$(c.tot)}</td>
+      </tr>`;
+    }
+    h+=`<tr class="subt"><td>TOTAL</td><td colspan="6"></td><td class="r">${fm$(sumTot)}</td></tr>
+    </table></div></div>`;
+  }
+
+  if(!hayByLocal&&costoTotal===0){
+    h+=`<p class="note" style="margin-top:12px">Completá los costos de delivery por local en la pantalla de inicio para ver el análisis completo.</p>`;
+  }
+
+  return editBtn+h;
+}
+
+// ======== EDITAR COSTOS DE CADETERÍA ========
+function openEditCostos(){
+  const pd=getActivePd();
+  const bl=pd?.deliveryInputs?.byLocal||{};
+  const v=(loc,k)=>bl[loc]?.[k]||'';
+  const inp=(id,lbl,val)=>`<div style="margin-bottom:6px">
+    <div style="font-size:10px;color:var(--GR);margin-bottom:2px">${lbl}</div>
+    <input type="number" id="ec-${id}" class="inp" style="margin:0" placeholder="$" min="0" value="${val}">
+  </div>`;
+  const col=(tit,fields)=>`<div style="flex:1;min-width:180px;background:var(--GL);border-radius:10px;padding:13px;border-top:3px solid var(--M)">
+    <div style="font-size:11px;font-weight:700;color:var(--M);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">${tit}</div>
+    ${fields}
+  </div>`;
+  const modal=`<div id="modal-costos" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px">
+    <div style="background:var(--WH);border-radius:14px;padding:24px;max-width:780px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.25)">
+      <div style="font-size:15px;font-weight:700;color:var(--M);margin-bottom:4px">✏️ Editar costos de cadetería</div>
+      <div style="font-size:12px;color:var(--GR);margin-bottom:18px">Período: <strong>${curPeriod}</strong> — los cambios se aplican solo a este mes</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px">
+        ${col('Zelarrayan',
+          inp('z-cy','Cadete Ya ($)',v('Zelarrayan','cy'))+
+          inp('z-sq','Squad ($)',v('Zelarrayan','sq'))+
+          inp('z-ecy','Viajes Cadete Ya ($)',v('Zelarrayan','extCY'))+
+          inp('z-erb','Rapiboy ($)',v('Zelarrayan','extRB'))+
+          inp('z-eub','Uber Envíos ($)',v('Zelarrayan','extUB'))
+        )}
+        ${col('Centro',
+          inp('c-cy','Cadete Ya ($)',v('Centro','cy'))+
+          inp('c-sq','Squad ($)',v('Centro','sq'))+
+          inp('c-ecy','Viajes Cadete Ya ($)',v('Centro','extCY'))+
+          inp('c-erb','Rapiboy ($)',v('Centro','extRB'))+
+          inp('c-eub','Uber Envíos ($)',v('Centro','extUB'))
+        )}
+        ${col('Patagonia',
+          inp('p-cy','Cadete Ya ($)',v('Patagonia','cy'))+
+          inp('p-sq','Squad ($)',v('Patagonia','sq'))+
+          inp('p-el','Elsa ($)',v('Patagonia','el'))+
+          inp('p-ecy','Viajes Cadete Ya ($)',v('Patagonia','extCY'))+
+          inp('p-erb','Rapiboy ($)',v('Patagonia','extRB'))+
+          inp('p-eub','Uber Envíos ($)',v('Patagonia','extUB'))
+        )}
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button class="btnb" onclick="closeEditCostos()" style="background:var(--GL)">Cancelar</button>
+        <button class="btnb" onclick="saveEditCostos()" style="background:var(--M);color:#fff;border-color:var(--M)">✅ Guardar cambios</button>
+      </div>
+    </div>
+  </div>`;
+  document.body.insertAdjacentHTML('beforeend',modal);
+}
+function closeEditCostos(){
+  const m=document.getElementById('modal-costos');
+  if(m)m.remove();
+}
+function saveEditCostos(){
+  const g=id=>parseFloat(document.getElementById('ec-'+id)?.value)||0;
+  const newDI={
+    edCost:getActivePd()?.deliveryInputs?.edCost||null,
+    byLocal:{
+      Zelarrayan:{cy:g('z-cy'),sq:g('z-sq'),el:0,extCY:g('z-ecy'),extRB:g('z-erb'),extUB:g('z-eub')},
+      Centro:{cy:g('c-cy'),sq:g('c-sq'),el:0,extCY:g('c-ecy'),extRB:g('c-erb'),extUB:g('c-eub')},
+      Patagonia:{cy:g('p-cy'),sq:g('p-sq'),el:g('p-el'),extCY:g('p-ecy'),extRB:g('p-erb'),extUB:g('p-eub')}
+    }
+  };
+  if(appData.periods[curPeriod]){
+    appData.periods[curPeriod].deliveryInputs=newDI;
+  }
+  closeEditCostos();
+  renderContent();
+}
+
+// ======== RENDER DESCUENTOS ========
+function renderDescuentos(D){
+  const dlist=D.discounts||[];
+  if(!dlist.length)return`<div class="sec"><div class="st">Descuentos</div>
+    <p style="color:var(--GR);padding:16px 0">No hay descuentos en este período, o la hoja <strong>"Descuentos"</strong> no está presente en el export de Fudo.</p></div>`;
+
+  // Group by nombre
+  const byNombre={};
+  let totalDsc=0;
+  for(const d of dlist){
+    if(!byNombre[d.nombre])byNombre[d.nombre]={count:0,monto:0};
+    byNombre[d.nombre].count++;
+    byNombre[d.nombre].monto+=d.monto;
+    totalDsc+=d.monto;
+  }
+  const sorted=Object.entries(byNombre).sort((a,b)=>b[1].monto-a[1].monto);
+
+  let h=`<div class="sec"><div class="st">Descuentos por tipo</div>
+  <div class="tw"><table>
+    <tr><th>Tipo de descuento</th><th class="r">Aplicaciones</th><th class="r">Monto total ($)</th><th class="r">Prom. por aplic.</th><th class="r">% del total</th></tr>`;
+  for(const[nm,v]of sorted){
+    h+=`<tr class="dr"><td>${nm}</td>
+      <td class="r">${fmN(v.count,0)}</td>
+      <td class="r">${fm$(v.monto)}</td>
+      <td class="r">${v.count?fm$(v.monto/v.count):'—'}</td>
+      <td class="r">${fmPct(v.monto,totalDsc||1)}</td>
+    </tr>`;
+  }
+  h+=`<tr class="subt"><td>TOTAL</td>
+    <td class="r">${fmN(dlist.length,0)}</td>
+    <td class="r">${fm$(totalDsc)}</td>
+    <td class="r">${dlist.length?fm$(totalDsc/dlist.length):'—'}</td>
+    <td class="r">100%</td>
+  </tr></table></div></div>`;
+
+  return h;
+}
+
+// ======== RENDER COSTOS ========
+function renderCostos(D){
+  const prods=sortedProds(D.products).filter(p=>p.cat!=='Promos');
+  const hasCost=prods.some(p=>p.cost!=null);
+  if(!hasCost)return`<div class="sec"><div class="st">Costos y márgenes</div>
+    <p style="color:var(--GR);padding:20px 0">No hay archivo de costos cargado. En la pantalla de inicio, subí el archivo <strong>costos productos.xlsx</strong>.</p></div>`;
+
+  const catTot={};
+  for(const p of prods){
+    if(!catTot[p.cat])catTot[p.cat]={qty:0,rev:0,cst:0,hasCost:false};
+    const ct=catTot[p.cat];
+    ct.qty+=p.qty;ct.rev+=p.revenue;
+    if(p.cost!=null){ct.cst+=p.cost*p.qty;ct.hasCost=true}
+  }
+
+  let h=`<div class="sec"><div class="st">Costos y márgenes por producto</div>
+  <div class="tw"><table>
+    <tr>
+      ${thTip('Producto','Nombre del producto según Fudo.','').replace('class="r','class="')}
+      ${thTip('Unidades','Total de unidades vendidas en el período.')}
+      ${thTip('Precio de lista','Precio unitario más frecuente registrado en el período (moda).')}
+      ${thTip('Costo unit.','Costo unitario cargado en la planilla de costos.')}
+      ${thTip('Ganancia unit.','Precio de lista − Costo unitario.')}
+      ${thTip('Margen %','Ganancia unitaria ÷ Precio de lista. Rojo < 20%, verde > 50%.')}
+      ${thTip('Ganancia total','Ganancia unitaria × Unidades vendidas.')}
+    </tr>`;
+
+  let lastCat='';
+  let totRev=0,totCst=0;
+  for(const p of prods){
+    if(p.cat!==lastCat){
+      if(lastCat){
+        const ct=catTot[lastCat];
+        const mg=ct.hasCost&&ct.rev?(ct.rev-ct.cst)/ct.rev*100:null;
+        h+=`<tr class="subt"><td>Subtotal ${lastCat}</td>
+          <td class="r">${fmN(ct.qty,1)}</td><td></td><td></td><td></td>
+          <td class="r">${mg!=null?fmN(mg,1)+'%':'—'}</td>
+          <td class="r">${ct.hasCost?fm$(ct.rev-ct.cst):'—'}</td></tr>`;
+      }
+      h+=`<tr class="catr"><td colspan="7">${p.cat}</td></tr>`;
+      lastCat=p.cat;
+    }
+    const lp=listPrice(p);
+    const gain=p.cost!=null&&lp!=null?lp-p.cost:null;
+    const marg=gain!=null&&lp?gain/lp*100:null;
+    if(p.revenue)totRev+=p.revenue;
+    if(p.cost!=null&&p.qty)totCst+=p.cost*p.qty;
+    h+=`<tr class="dr"><td>${elLabel(p.name)}</td>
+      <td class="r">${fmN(p.qty,1)}</td>
+      <td class="r">${lp!=null?fm$(lp):'—'}</td>
+      <td class="r">${p.cost!=null?fm$(p.cost):'—'}</td>
+      <td class="r">${gain!=null?fm$(gain):'—'}</td>
+      <td class="r" style="${marg!=null?'color:'+(marg<20?'#c62828':marg>50?'var(--GN)':'inherit'):''}">
+        ${marg!=null?fmN(marg,1)+'%':'—'}</td>
+      <td class="r">${gain!=null&&p.qty?fm$(gain*p.qty):'—'}</td>
+    </tr>`;
+  }
+  if(lastCat){
+    const ct=catTot[lastCat];
+    const mg=ct.hasCost&&ct.rev?(ct.rev-ct.cst)/ct.rev*100:null;
+    h+=`<tr class="subt"><td>Subtotal ${lastCat}</td>
+      <td class="r">${fmN(ct.qty,1)}</td><td></td><td></td><td></td>
+      <td class="r">${mg!=null?fmN(mg,1)+'%':'—'}</td>
+      <td class="r">${ct.hasCost?fm$(ct.rev-ct.cst):'—'}</td></tr>`;
+  }
+  const totMg=totRev&&totCst?(totRev-totCst)/totRev*100:null;
+  h+=`<tr class="subt" style="font-size:13px"><td>TOTAL GENERAL</td>
+    <td></td><td></td><td></td><td></td>
+    <td class="r">${totMg!=null?fmN(totMg,1)+'%':'—'}</td>
+    <td class="r">${fm$(totRev-totCst)}</td>
+  </tr>`;
+  h+=`</table></div>
+  <p class="note" style="margin-top:8px">Margen en rojo &lt; 20% · verde &gt; 50%. Precio de lista = precio más frecuente registrado en el período.</p></div>`;
+  return h;
+}
+
+// ======== RENDER MENÚ INFANTIL ========
+function renderCajita(D){
+  const cj=D.cajitaData||{};
+  const total=cj.total||0;
+  if(!total)return`<div class="sec"><div class="st">🍱 Menú Infantil</div><p class="note">No hay datos de Cajita Criolla en este período. Procesá los archivos XLS para ver el análisis.</p></div>`;
+  const emps=Object.entries(cj.empanadas||{}).sort((a,b)=>b[1]-a[1]);
+  const totEmp=emps.reduce((s,[,v])=>s+v,0)||1;
+  const bebs=Object.entries(cj.bebidas||{}).sort((a,b)=>b[1]-a[1]);
+  const totBeb=bebs.reduce((s,[,v])=>s+v,0)||1;
+  const regs=Object.entries(cj.regalos||{}).sort((a,b)=>b[1]-a[1]);
+  const totReg=regs.reduce((s,[,v])=>s+v,0)||1;
+  const extEntries=Object.entries(cj.extras||{}).sort((a,b)=>b[1]-a[1]);
+  const totExt=extEntries.reduce((s,[,v])=>s+v,0);
+  const combos=Object.entries(cj.combos||{}).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  let h=`<div class="sec">
+    <div class="st">🍱 Cajita Criolla</div>
+    <div class="krow" style="grid-template-columns:repeat(2,1fr);margin-bottom:18px">
+      <div class="kpi" style="border-left:4px solid #E91E63"><div class="lbl">Cajitas vendidas</div><div class="val" style="color:#880E4F">${total}</div></div>
+      <div class="kpi" style="border-left:4px solid #E91E63"><div class="lbl">Adiciones extra</div><div class="val" style="color:#880E4F">${totExt||0}</div></div>
+    </div>`;
+
+  // Sabores empanada
+  h+=`<div class="st">Sabores de empanada</div>
+    <div class="tw" style="max-height:none"><table style="font-size:12px">
+      <tr><th>Sabor</th><th class="r">Unidades</th><th class="r">%</th><th style="min-width:160px"></th></tr>`;
+  for(const[sab,qty]of emps){
+    const pct=qty/totEmp*100;
+    h+=`<tr class="dr"><td><strong>${sab}</strong></td>
+      <td class="r" style="font-weight:700">${fmN(qty,0)}</td>
+      <td class="r">${fmN(pct,1)}%</td>
+      <td><div style="background:var(--OR);height:8px;border-radius:4px;width:${Math.round(pct*1.6)}px;margin:4px 0"></div></td></tr>`;
+  }
+  h+=`<tr class="subt"><td>Total empanadas</td><td class="r">${fmN(totEmp,0)}</td><td></td><td></td></tr>
+    </table></div>`;
+
+  // Extras
+  if(totExt>0){
+    h+=`<div class="st" style="margin-top:14px">Empanadas extra (adicionales)</div>
+      <div class="tw" style="max-height:none"><table style="font-size:12px">
+        <tr><th>Sabor</th><th class="r">Unidades</th></tr>`;
+    for(const[sab,qty]of extEntries)h+=`<tr class="dr"><td>${sab}</td><td class="r" style="font-weight:700">${fmN(qty,0)}</td></tr>`;
+    h+=`<tr class="subt"><td>Total extras</td><td class="r">${fmN(totExt,0)}</td></tr></table></div>`;
+  }
+
+  // Bebida y regalo lado a lado
+  h+=`<div class="g2" style="margin-top:14px"><div>
+    <div class="st">Bebida elegida</div>
+    <div class="tw" style="max-height:none"><table style="font-size:12px">
+      <tr><th>Bebida</th><th class="r">Cajitas</th><th class="r">%</th></tr>`;
+  for(const[beb,n]of bebs)h+=`<tr class="dr"><td>${beb}</td><td class="r" style="font-weight:700">${n}</td><td class="r">${fmN(n/totBeb*100,1)}%</td></tr>`;
+  h+=`</table></div></div><div>
+    <div class="st">Regalo elegido</div>
+    <div class="tw" style="max-height:none"><table style="font-size:12px">
+      <tr><th>Sticker</th><th class="r">Cajitas</th><th class="r">%</th></tr>`;
+  for(const[reg,n]of regs)h+=`<tr class="dr"><td>${reg.replace('Stickers - ','')}</td><td class="r" style="font-weight:700">${n}</td><td class="r">${fmN(n/totReg*100,1)}%</td></tr>`;
+  h+=`</table></div></div></div>`;
+
+  // Combinaciones más pedidas
+  if(combos.length){
+    h+=`<div class="st" style="margin-top:14px">Combinaciones más pedidas</div>
+      <div class="tw" style="max-height:none"><table style="font-size:12px">
+        <tr><th>Combinación de sabores</th><th class="r">Veces</th></tr>`;
+    for(const[combo,n]of combos)h+=`<tr class="dr"><td>${combo}</td><td class="r" style="font-weight:700">${n}</td></tr>`;
+    h+=`</table></div>`;
+  }
+  h+=`</div>`;
+  return h;
+}
+
+// ======== DISPATCH ========
+function renderSec(secId,D,all){
+  switch(secId){
+    case'resumen':return renderResumen(D,all);
+    case'ventas':return renderVentas(D);
+    case'origen':return renderOrigen(D);
+    case'promedios':return renderPromedios(D);
+    case'vendedores':return renderVendedores(D);
+    case'envios':return renderEnvios(D);
+    case'costos':return renderCostos(D);
+    default:return'';
+  }
+}
+
+// ======== MERGE HISTORICAL ========
+function addN(a,b){return(+a||0)+(+b||0)}
+function addObj(A,B){
+  const R={};
+  for(const k of new Set([...Object.keys(A||{}),...Object.keys(B||{})]))
+    R[k]=addN((A||{})[k],(B||{})[k]);
+  return R;
+}
+function mergeProductArrays(arrA,arrB){
+  const m=new Map();
+  for(const p of(arrA||[])){m.set(p.name,{...p,byDate:{...p.byDate},byTurno:{...p.byTurno},byCanal:{...p.byCanal},_prices:{...p._prices||{}}})}
+  for(const p of(arrB||[])){
+    if(!m.has(p.name)){m.set(p.name,{...p,byDate:{...p.byDate},byTurno:{...p.byTurno},byCanal:{...p.byCanal},_prices:{...p._prices||{}}});continue}
+    const g=m.get(p.name);
+    g.qty=addN(g.qty,p.qty);g.revenue=addN(g.revenue,p.revenue);
+    if(g.cost==null)g.cost=p.cost;
+    for(const[d,q]of Object.entries(p.byDate||{}))g.byDate[d]=addN(g.byDate[d],q);
+    for(const[t,q]of Object.entries(p.byTurno||{}))g.byTurno[t]=addN(g.byTurno[t],q);
+    for(const[c,q]of Object.entries(p.byCanal||{}))g.byCanal[c]=addN(g.byCanal[c],q);
+    for(const[pk,q]of Object.entries(p._prices||{}))g._prices[pk]=addN(g._prices[pk],q);
+  }
+  return Array.from(m.values());
+}
+function mergeByDate(A,B){
+  const R={};
+  const addBD=(a,b)=>({
+    ped:addN(a?.ped,b?.ped),ven:addN(a?.ven,b?.ven),mos:addN(a?.mos,b?.mos),
+    py:addN(a?.py,b?.py),del:addN(a?.del,b?.del),prod:addN(a?.prod,b?.prod),
+    td:{
+      Mediodía:{ped:addN(a?.td?.Mediodía?.ped,b?.td?.Mediodía?.ped),ven:addN(a?.td?.Mediodía?.ven,b?.td?.Mediodía?.ven),
+        mos:addN(a?.td?.Mediodía?.mos,b?.td?.Mediodía?.mos),py:addN(a?.td?.Mediodía?.py,b?.td?.Mediodía?.py),del:addN(a?.td?.Mediodía?.del,b?.td?.Mediodía?.del)},
+      Noche:{ped:addN(a?.td?.Noche?.ped,b?.td?.Noche?.ped),ven:addN(a?.td?.Noche?.ven,b?.td?.Noche?.ven),
+        mos:addN(a?.td?.Noche?.mos,b?.td?.Noche?.mos),py:addN(a?.td?.Noche?.py,b?.td?.Noche?.py),del:addN(a?.td?.Noche?.del,b?.td?.Noche?.del)}
+    }
+  });
+  for(const d of new Set([...Object.keys(A||{}),...Object.keys(B||{})]))R[d]=addBD(A?.[d],B?.[d]);
+  return R;
+}
+function mergeLocal(A,B){
+  // A = new period, B = historical; B's period comes first in the label
+  const totalPed=addN(A.totalPedidos,B.totalPedidos);
+  const totalVen=addN(A.totalVentas,B.totalVentas);
+  const totalProd=addN(A.totalProductos,B.totalProductos);
+  const canal={};
+  for(const c of['Mostrador','PedidosYa','Delivery'])
+    canal[c]={ped:addN(A.canal?.[c]?.ped,B.canal?.[c]?.ped),
+              ven:addN(A.canal?.[c]?.ven,B.canal?.[c]?.ven),
+              prod:addN(A.canal?.[c]?.prod,B.canal?.[c]?.prod)};
+  const byTurno={};
+  for(const t of['Mediodía','Noche'])
+    byTurno[t]={ped:addN(A.byTurno?.[t]?.ped,B.byTurno?.[t]?.ped),
+                ven:addN(A.byTurno?.[t]?.ven,B.byTurno?.[t]?.ven),
+                prod:addN(A.byTurno?.[t]?.prod,B.byTurno?.[t]?.prod),
+                mos:addN(A.byTurno?.[t]?.mos,B.byTurno?.[t]?.mos),
+                py:addN(A.byTurno?.[t]?.py,B.byTurno?.[t]?.py),
+                del:addN(A.byTurno?.[t]?.del,B.byTurno?.[t]?.del),
+                dayCount:addN(A.byTurno?.[t]?.dayCount,B.byTurno?.[t]?.dayCount)};
+  const empMap={};
+  for(const[e,v]of Object.entries(A.empMap||{})){empMap[e]={ped:v.ped,ven:v.ven,prod:v.prod}}
+  for(const[e,v]of Object.entries(B.empMap||{})){
+    if(!empMap[e])empMap[e]={ped:0,ven:0,prod:0};
+    empMap[e].ped+=v.ped;empMap[e].ven+=v.ven;empMap[e].prod+=v.prod;
+  }
+  const repMap={};
+  for(const[e,v]of Object.entries(A.repMap||{})){repMap[e]={ped:v.ped,ven:v.ven,prod:v.prod}}
+  for(const[e,v]of Object.entries(B.repMap||{})){
+    if(!repMap[e])repMap[e]={ped:0,ven:0,prod:0};
+    repMap[e].ped+=v.ped;repMap[e].ven+=v.ven;repMap[e].prod+=v.prod;
+  }
+  const vendMap={};
+  for(const[e,v]of Object.entries(A.vendMap||{})){vendMap[e]={ped:v.ped,ven:v.ven,prod:v.prod}}
+  for(const[e,v]of Object.entries(B.vendMap||{})){
+    if(!vendMap[e])vendMap[e]={ped:0,ven:0,prod:0};
+    vendMap[e].ped+=v.ped;vendMap[e].ven+=v.ven;vendMap[e].prod+=v.prod;
+  }
+  const discounts=[...(A.discounts||[]),...(B.discounts||[])];
+  const ads=A.deliveryStats||{},bds=B.deliveryStats||{};
+  const deliveryStats={
+    ingresosEnvio:addN(ads.ingresosEnvio,bds.ingresosEnvio),
+    ingresoCE:addN(ads.ingresoCE,bds.ingresoCE),
+    ingresoEnvioAdic:addN(ads.ingresoEnvioAdic,bds.ingresoEnvioAdic),
+    enviosSinCargo:addN(ads.enviosSinCargo,bds.enviosSinCargo),
+    enviosCobrados:addN(ads.enviosCobrados,bds.enviosCobrados)
+  };
+  return{
+    name:A.name,
+    period:[B.period,A.period].filter(Boolean).join(' → '),
+    uniqueDays:addN(A.uniqueDays,B.uniqueDays),
+    totalVentas:totalVen,totalPedidos:totalPed,totalProductos:totalProd,
+    ticketProm:totalPed?totalVen/totalPed:0,
+    prodPorTicket:totalPed?totalProd/totalPed:0,
+    canal,
+    products:mergeProductArrays(A.products,B.products),
+    byDate:mergeByDate(A.byDate,B.byDate),
+    byTurno,payMap:addObj(A.payMap,B.payMap),empMap,repMap,vendMap,discounts,deliveryStats
+  };
+}
+function mergeAppData(curr,hist){
+  // curr = new period processed, hist = loaded historical JSON
+  const mergedLocals=curr.locals.map((L,i)=>{
+    const H=hist.locals?.[i];
+    return H?mergeLocal(L,H):L;
+  });
+  const mergedGlobal=buildGlobal(mergedLocals);
+  // Compute actual date range from all merged data
+  const allDates=new Set();
+  for(const L of mergedLocals)for(const d of Object.keys(L.byDate||{}))allDates.add(d);
+  const sorted=[...allDates].sort();
+  const autoRange=sorted.length?`${fmD(sorted[0])} — ${fmD(sorted[sorted.length-1])}`:'';
+  // If user explicitly typed a label (not an auto date range), use it; otherwise use date range
+  const userLabel=curr.period&&!curr.period.includes(' — ')?curr.period:'';
+  const period=userLabel||autoRange||hist.period;
+  return{global:mergedGlobal,locals:mergedLocals,period,
+    deliveryInputs:curr.deliveryInputs||hist.deliveryInputs};
+}
+
+// ======== APP STATE ========
+const files={};
+let costData=null;
+let histData=null;
+let horasData=null;
+let appData=null;
+let curTab=0;
+let curSec='evolucion';
+let curResSub=0;
+let curPeriod=null; // período seleccionado actualmente
+
+// Normaliza formato antiguo (objeto simple) al nuevo (multi-período)
+function normalizeAppData(data){
+  // Soporta tanto 'periods' (inglés) como 'periodos' (español)
+  if(data&&(data.periods||data.periodos)){
+    if(data.periodos&&!data.periods){
+      data.periods=data.periodos;
+      data.periodOrder=data.periodOrder||data.periodoOrder||Object.keys(data.periodos);
+    }
     return data;
   }
-
-  // ---------- helpers ----------
-  function todayStr(){
-    var d = new Date();
-    var m = (d.getMonth()+1+"").padStart(2,"0");
-    var day = (d.getDate()+"").padStart(2,"0");
-    return d.getFullYear()+"-"+m+"-"+day;
-  }
-  function fmtDate(s){
-    if(!s) return "";
-    var p = String(s).split("-");
-    if(p.length===3 && p[0].length===4){
-      return p[2].slice(0,2)+"/"+p[1]+"/"+p[0];
+  const p=data?.period||'Período';
+  return{periods:{[p]:data},periodOrder:[p],deliveryInputs:data?.deliveryInputs,elSabor:data?.elSabor};
+}
+// Migra nombres de productos existentes según PROD_ALIAS (para datos ya guardados en la nube)
+function mergeByAlias(products){
+  const map=new Map();
+  for(const p of products){
+    if(isExclude(p.name))continue;
+    const normName=normProdName(p.name);
+    if(isExclude(normName))continue;
+    // Corregir categoría según nombre canónico (evita que aliases guardados con cat='Promos' persistan)
+    let fixedCat=p.cat;
+    if(/\bH$/i.test(normName.trim()))fixedCat='Empanadas Horno';
+    else if(/\bF$/i.test(normName.trim()))fixedCat='Empanadas Fritas';
+    if(!map.has(normName)){
+      map.set(normName,{...p,name:normName,cat:fixedCat});
+    }else{
+      const ex=map.get(normName);
+      ex.qty=(ex.qty||0)+(p.qty||0);
+      ex.revenue=(ex.revenue||0)+(p.revenue||0);
+      if(p.byDate){ex.byDate=ex.byDate||{};for(const[d,q]of Object.entries(p.byDate))ex.byDate[d]=(ex.byDate[d]||0)+q;}
+      if(p.byTurno){ex.byTurno=ex.byTurno||{};for(const[t,q]of Object.entries(p.byTurno))ex.byTurno[t]=(ex.byTurno[t]||0)+q;}
+      if(p.byCanal){ex.byCanal=ex.byCanal||{};for(const[c,q]of Object.entries(p.byCanal))ex.byCanal[c]=(ex.byCanal[c]||0)+q;}
     }
-    // Por si llega algo que no sea "yyyy-mm-dd" (por ejemplo una fecha sin
-    // normalizar), lo interpretamos igual en vez de mostrar texto crudo.
-    try{
-      var d = new Date(s);
-      if(isNaN(d.getTime())) return String(s);
-      return d.toLocaleDateString("es-AR",{day:"2-digit",month:"2-digit",year:"numeric"});
-    }catch(e){ return String(s); }
   }
-  function fmtDateTime(iso){
-    try{
-      var d = new Date(iso);
-      return d.toLocaleDateString("es-AR",{day:"2-digit",month:"2-digit"}) + " " + d.toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"});
-    }catch(e){ return ""; }
-  }
-  function esc(s){
-    return (s==null?"":String(s)).replace(/[&<>"']/g, function(c){
-      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
-    });
-  }
-  function uid(){ return Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-4); }
-
-  function toast(msg){
-    var t = document.getElementById("toast");
-    t.textContent = msg;
-    t.classList.add("show");
-    clearTimeout(toast._h);
-    toast._h = setTimeout(function(){ t.classList.remove("show"); }, 2400);
-  }
-  function safeLS(){ try{ return window.localStorage; }catch(e){ return null; } }
-  function lsGet(k, d){ var ls=safeLS(); if(!ls) return d; try{ var v=ls.getItem(k); return v==null?d:v; }catch(e){ return d; } }
-  function lsSet(k,v){ var ls=safeLS(); if(!ls) return; try{ ls.setItem(k,v); }catch(e){} }
-
-  function groupByCategory(items){
-    var byCat = {};
-    CATEGORIES.forEach(function(c){ byCat[c.key]=[]; });
-    items.forEach(function(it){
-      if(!byCat[it.category]) byCat[it.category]=[];
-      byCat[it.category].push(it);
-    });
-    return byCat;
-  }
-
-  // ---------- data load / poll ----------
-  function loadData(silent){
-    if(!apiConfigured()){
-      loaded = true;
-      var main = document.getElementById("main");
-      main.innerHTML = '<div class="panel"><div class="panel-body"><div class="banner" style="margin:0">'+
-        'Falta un paso: abrí este archivo Index.html, buscá la línea <code>API_URL</code> cerca del comienzo del script '+
-        'y pegá ahí la URL que te dio Apps Script al implementar (termina en <code>/exec</code>). Después volvé a subirlo a GitHub.'+
-        '</div></div></div>';
-      return Promise.resolve();
-    }
-    return callServer("getData").then(function(data){
-      catalogItems = data.catalog || [];
-      pedidos = data.pedidos || [];
-      loaded = true;
-      render();
-    }).catch(function(err){
-      console.error(err);
-      if(!silent) toast("No se pudo cargar. Revisá la conexión.");
-      if(!loaded){ loaded = true; render(); }
-    });
-  }
-
-  setInterval(function(){
-    // Solo actualiza en segundo plano si no hay algo a medio escribir.
-    if(state.tab==="pedidos" && !state.detailId){ loadData(true); }
-    else if(state.tab==="catalogo"){ loadData(true); }
-  }, POLL_MS);
-
-  // ---------- render root ----------
-  function render(){
-    var main = document.getElementById("main");
-    document.querySelectorAll("#tabs button").forEach(function(b){
-      b.classList.toggle("active", b.getAttribute("data-tab")===state.tab);
-    });
-    var pendCount = pedidos.filter(function(p){ return p.estado==="pendiente" || p.estado==="enviado"; }).length;
-    var pc = document.getElementById("pendingCount");
-    if(pendCount>0){ pc.style.display="inline-block"; pc.textContent=pendCount; }
-    else { pc.style.display="none"; }
-
-    if(!loaded){
-      main.innerHTML = '<div class="empty"><div class="big">🧾</div>Cargando catálogo…</div>';
-      return;
-    }
-    if(state.tab==="nuevo") return renderNuevo(main);
-    if(state.tab==="pedidos"){
-      if(state.detailId) return renderDetail(main, state.detailId);
-      return renderLista(main);
-    }
-    if(state.tab==="catalogo") return renderCatalogo(main);
-  }
-
-  // ---------- TAB: Nuevo pedido ----------
-  function buildNewOrderForm(){
-    var byCat = groupByCategory(catalogItems);
-    var items = {};
-    CATEGORIES.forEach(function(c){
-      byCat[c.key].forEach(function(it){
-        items[it.id] = {id:it.id, category:c.key, name:it.name, qty:""};
-      });
-    });
-    return {
-      local: lsGet("dc_last_local", ""),
-      quienPide: lsGet("dc_quien_pide", ""),
-      fecha: todayStr(),
-      notas: "",
-      items: items,
-      extra: []
-    };
-  }
-
-  function renderNuevo(main){
-    if(!state.newOrderForm){ state.newOrderForm = buildNewOrderForm(); }
-    var f = state.newOrderForm;
-    var byCat = groupByCategory(catalogItems);
-
-    var html = '';
-    if(catalogItems.length===0){
-      html += '<div class="banner">Todavía no hay ítems en el catálogo. Cargalos desde la pestaña <b>Catálogo</b>.</div>';
-    }
-    html += '<div class="panel"><div class="panel-body">';
-    html += '<div class="row2">';
-    html += fieldSelect("Local", "f_local", LOCALES.map(function(l){return {v:l.key,l:l.label};}), f.local, true);
-    html += fieldInput("Fecha del pedido", "f_fecha", "date", f.fecha);
-    html += '</div>';
-    html += fieldInput("¿Quién pide?", "f_quien", "text", f.quienPide);
-    html += fieldInput("Notas (opcional)", "f_notas", "text", f.notas);
-    html += '</div></div>';
-
-    CATEGORIES.forEach(function(c){
-      var list = byCat[c.key];
-      var extraList = f.extra.filter(function(e){ return e.category===c.key; });
-      html += '<div class="panel"><div class="cat-block">';
-      html += '<div class="cat-title">'+esc(c.label)+'</div>';
-      list.forEach(function(it){
-        var val = f.items[it.id] ? f.items[it.id].qty : "";
-        html += '<div class="item-row">';
-        html += '<div class="item-name">'+esc(it.name)+'</div>';
-        html += '<input class="qty-input" type="text" inputmode="numeric" placeholder="cant." data-item-id="'+it.id+'" value="'+esc(val)+'">';
-        html += '</div>';
-      });
-      extraList.forEach(function(e){
-        html += '<div class="item-row">';
-        html += '<div class="item-name">'+esc(e.name)+'<span class="tag-extra">nuevo</span></div>';
-        html += '<input class="qty-input" type="text" inputmode="numeric" placeholder="cant." data-extra-id="'+e.tempId+'" value="'+esc(e.qty)+'">';
-        html += '<button class="rm-btn" data-rm-extra="'+e.tempId+'" title="Quitar" type="button">×</button>';
-        html += '</div>';
-      });
-      html += '<div class="extra-add">';
-      html += '<input type="text" placeholder="Agregar ítem puntual…" data-extra-name-cat="'+c.key+'">';
-      html += '<button class="btn btn-ghost btn-sm" type="button" data-extra-add-cat="'+c.key+'">+ Agregar</button>';
-      html += '</div>';
-      html += '</div></div>';
-    });
-
-    html += '<button class="btn btn-primary btn-block" id="submitOrder" type="button">Enviar pedido</button>';
-
-    main.innerHTML = html;
-
-    main.querySelector("#f_local").addEventListener("change", function(e){ f.local = e.target.value; });
-    main.querySelector("#f_fecha").addEventListener("change", function(e){ f.fecha = e.target.value; });
-    main.querySelector("#f_quien").addEventListener("input", function(e){ f.quienPide = e.target.value; });
-    main.querySelector("#f_notas").addEventListener("input", function(e){ f.notas = e.target.value; });
-
-    main.querySelectorAll("[data-item-id]").forEach(function(inp){
-      inp.addEventListener("input", function(){
-        var id = inp.getAttribute("data-item-id");
-        if(!f.items[id]) return;
-        f.items[id].qty = inp.value;
-      });
-    });
-    main.querySelectorAll("[data-extra-id]").forEach(function(inp){
-      inp.addEventListener("input", function(){
-        var id = inp.getAttribute("data-extra-id");
-        var e = f.extra.find(function(x){return x.tempId===id;});
-        if(e) e.qty = inp.value;
-      });
-    });
-    main.querySelectorAll("[data-rm-extra]").forEach(function(btn){
-      btn.addEventListener("click", function(){
-        var id = btn.getAttribute("data-rm-extra");
-        f.extra = f.extra.filter(function(x){ return x.tempId!==id; });
-        renderNuevo(main);
-      });
-    });
-    main.querySelectorAll("[data-extra-add-cat]").forEach(function(btn){
-      btn.addEventListener("click", function(){
-        var cat = btn.getAttribute("data-extra-add-cat");
-        var input = main.querySelector('[data-extra-name-cat="'+cat+'"]');
-        var name = (input.value||"").trim();
-        if(!name){ input.focus(); return; }
-        f.extra.push({tempId:uid(), category:cat, name:name, qty:""});
-        renderNuevo(main);
-      });
-    });
-
-    main.querySelector("#submitOrder").addEventListener("click", function(){ submitOrder(f); });
-  }
-
-  function fieldInput(label, id, type, val){
-    return '<label class="field"><span class="lbl">'+esc(label)+'</span>'+
-      '<input type="'+type+'" id="'+id+'" value="'+esc(val)+'"></label>';
-  }
-  function fieldSelect(label, id, opts, val, withPlaceholder){
-    var html = '<label class="field"><span class="lbl">'+esc(label)+'</span><select id="'+id+'">';
-    if(withPlaceholder) html += '<option value=""'+(val===""?" selected":"")+' disabled>Elegir…</option>';
-    opts.forEach(function(o){
-      html += '<option value="'+esc(o.v)+'"'+(o.v===val?" selected":"")+'>'+esc(o.l)+'</option>';
-    });
-    html += '</select></label>';
-    return html;
-  }
-
-  function submitOrder(f){
-    if(!f.local){ toast("Elegí un local"); return; }
-    if(!f.fecha){ toast("Elegí una fecha"); return; }
-    var items = [];
-    Object.keys(f.items).forEach(function(id){
-      var it = f.items[id];
-      if(it.qty && it.qty.trim()!==""){
-        items.push({ id:it.id, category:it.category, name:it.name, isExtra:false, pedidoCant:it.qty.trim() });
+  return Array.from(map.values());
+}
+function migrateAliases(data){
+  if(!data||!data.periods)return data;
+  for(const pd of Object.values(data.periods)){
+    if(pd.locals){
+      for(const loc of Object.values(pd.locals)){
+        if(Array.isArray(loc.products))loc.products=mergeByAlias(loc.products);
       }
-    });
-    f.extra.forEach(function(e){
-      if(e.qty && e.qty.trim()!==""){
-        items.push({ id:e.tempId, category:e.category, name:e.name, isExtra:true, pedidoCant:e.qty.trim() });
-      }
-    });
-    if(items.length===0){ toast("Cargá al menos una cantidad"); return; }
-
-    var payload = { local:f.local, fecha:f.fecha, quienPide:(f.quienPide||"").trim(), notas:f.notas||"", items:items };
-    var btn = document.getElementById("submitOrder");
-    if(btn){ btn.disabled = true; btn.textContent = "Enviando…"; }
-    callServer("createPedido", payload).then(function(){
-      lsSet("dc_last_local", f.local);
-      lsSet("dc_quien_pide", payload.quienPide);
-      state.newOrderForm = null;
-      showOrderSuccess(payload);
-      loadData(true);
-    }).catch(function(err){
-      console.error(err);
-      toast("No se pudo enviar: "+(err&&err.message?err.message:"probá de nuevo."));
-      if(btn){ btn.disabled=false; btn.textContent="Enviar pedido"; }
-    });
+    }
+    if(pd.global&&Array.isArray(pd.global.products))pd.global.products=mergeByAlias(pd.global.products);
   }
+  return data;
+}
 
-  function showOrderSuccess(payload){
-    var main = document.getElementById("main");
-    main.innerHTML =
-      '<div class="panel"><div class="success-screen">'+
-      '<div class="big">✅</div>'+
-      '<h2>Pedido enviado</h2>'+
-      '<p>'+esc(LOCAL_LABEL[payload.local]||payload.local)+' · '+esc(fmtDate(payload.fecha))+' · '+payload.items.length+' ítem'+(payload.items.length===1?"":"s")+'</p>'+
-      '<button class="btn btn-primary" id="anotherOrder" type="button">Cargar otro pedido</button>'+
-      '</div></div>';
-    main.querySelector("#anotherOrder").addEventListener("click", function(){ render(); });
-  }
+// Devuelve los datos del período activo
+function getActivePd(){
+  if(!appData)return null;
+  const pd=appData.periods||{};
+  return pd[curPeriod]||pd[Object.keys(pd)[0]]||null;
+}
 
-  // ---------- TAB: Pedidos y envíos (lista) ----------
-  var ESTADO_PEDIDO_INFO = {
-    pendiente: {cls:"badge-pending", label:"Pendiente"},
-    enviado: {cls:"badge-sent", label:"Esperando recepción"},
-    cerrado: {cls:"badge-closed", label:"Cerrado"}
+// ======== PROCESS HORAS FILE ========
+function processHorasFile(data){
+  const wb=XLSX.read(data,{type:'binary',raw:true,cellDates:false});
+  const out={
+    byLocal:{
+      Zelarrayan:{hsCY:0},
+      Centro:{hsCY:0,hsSquad:0},
+      Patagonia:{hsCY:0,hsElsa:0}
+    },
+    vh:0,extCY:0,extRB:0,extUB:0
   };
-  function estadoInfo(estado){
-    return ESTADO_PEDIDO_INFO[estado] || ESTADO_PEDIDO_INFO.pendiente;
-  }
 
-  function renderLista(main){
-    var html = '<div class="panel">';
-    html += '<div class="filters">';
-    html += '<select id="filtEstado">';
-    [["pendiente","Pendientes"],["enviado","Esperando recepción"],["cerrado","Cerrados"],["todos","Todos"]].forEach(function(o){
-      html += '<option value="'+o[0]+'"'+(state.filterEstado===o[0]?" selected":"")+'>'+o[1]+'</option>';
-    });
-    html += '</select>';
-    html += '<select id="filtLocal"><option value="TODOS"'+(state.filterLocal==="TODOS"?" selected":"")+'>Todos los locales</option>';
-    LOCALES.forEach(function(l){
-      html += '<option value="'+l.key+'"'+(state.filterLocal===l.key?" selected":"")+'>'+esc(l.label)+'</option>';
-    });
-    html += '</select>';
-    html += '<button class="btn btn-ghost btn-sm" id="exportCsv" type="button">⭳ Exportar CSV</button>';
-    html += '</div>';
-
-    var list = pedidos.filter(function(p){
-      if(state.filterEstado!=="todos" && p.estado!==state.filterEstado) return false;
-      if(state.filterLocal!=="TODOS" && p.local!==state.filterLocal) return false;
-      return true;
-    });
-
-    if(list.length===0){
-      html += '<div class="empty"><div class="big">📭</div>No hay pedidos con este filtro.</div>';
-    } else {
-      list.forEach(function(p){
-        var pend = (p.items||[]).filter(function(it){ return it.estadoItem==="pendiente"; }).length;
-        var falt = (p.items||[]).filter(function(it){ return it.estadoItem==="no_enviado"; }).length;
-        var subParts = [(p.items||[]).length + " ítems"];
-        if(pend>0) subParts.push(pend+" sin resolver");
-        if(falt>0) subParts.push(falt+" con faltante");
-        html += '<div class="order-card" data-open="'+p.id+'">';
-        html += '<div class="oc-main">';
-        html += '<div class="oc-local">'+esc(LOCAL_LABEL[p.local]||p.local)+' · '+esc(fmtDate(p.fecha))+'</div>';
-        html += '<div class="oc-sub">'+esc(subParts.join(" · "))+'</div>';
-        html += '</div>';
-        html += '<span class="badge '+estadoInfo(p.estado).cls+'">'+estadoInfo(p.estado).label+'</span>';
-        html += '<span class="oc-arrow">›</span>';
-        html += '</div>';
-      });
-    }
-    html += '</div>';
-    main.innerHTML = html;
-
-    main.querySelector("#filtEstado").addEventListener("change", function(e){ state.filterEstado=e.target.value; render(); });
-    main.querySelector("#filtLocal").addEventListener("change", function(e){ state.filterLocal=e.target.value; render(); });
-    main.querySelector("#exportCsv").addEventListener("click", function(){ exportCsv(list); });
-    main.querySelectorAll("[data-open]").forEach(function(card){
-      card.addEventListener("click", function(){
-        state.detailId = card.getAttribute("data-open");
-        state.editForm = null;
-        render();
-      });
-    });
-  }
-
-  // ---------- exportar historial a CSV (descarga directa en el navegador) ----------
-  function csvField(v){
-    var s = (v==null? "": String(v));
-    if(/[",;\n]/.test(s)) s = '"'+s.replace(/"/g,'""')+'"';
-    return s;
-  }
-  function exportCsv(list){
-    if(!list || list.length===0){ toast("No hay pedidos para exportar"); return; }
-    var header = ["Local","Fecha","Ítem","Cant. solicitada","Cant. enviada","Cant. recibida"];
-    var rows = [header];
-    list.forEach(function(p){
-      (p.items||[]).forEach(function(it){
-        rows.push([
-          LOCAL_LABEL[p.local]||p.local, fmtDate(p.fecha), it.name,
-          it.pedidoCant||"", it.envioCant||"", it.recibidoCant||""
-        ]);
-      });
-    });
-    var csv = "﻿" + rows.map(function(r){ return r.map(csvField).join(","); }).join("\r\n");
-    var localTag = state.filterLocal==="TODOS" ? "todos" : state.filterLocal.toLowerCase();
-    var filename = "pedidos_insumos_"+localTag+"_"+todayStr()+".csv";
-
-    try{
-      var blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement("a");
-      a.href = url; a.download = filename;
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
-      toast("Historial exportado");
-    }catch(err){
-      console.error(err);
-      toast("No se pudo exportar en este navegador");
+  // GASTOS EXTRAS sheet
+  const geN=wb.SheetNames.find(n=>/gastos/i.test(n));
+  if(geN){
+    const geA=XLSX.utils.sheet_to_json(wb.Sheets[geN],{header:1,raw:true,defval:''});
+    let vhNext=false;
+    for(const row of geA){
+      const lbl=String(row[0]||'').trim().toUpperCase();
+      const val=parseFloat(row[1])||0;
+      if(vhNext){if(val>0)out.vh=val;vhNext=false;continue;}
+      if(/viajes|cadete.*ya/i.test(lbl))out.extCY=val;
+      else if(/rapiboy/i.test(lbl))out.extRB=val;
+      else if(/uber/i.test(lbl))out.extUB=val;
+      else if(/valor.*hora/i.test(lbl)){if(val>0)out.vh=val;else vhNext=true;}
     }
   }
 
-  // Ítem marcado "no se envía": muestra el motivo/estimado y, si el
-  // pedido ya avanzó (esperando recepción o cerrado), un mini-formulario
-  // para reflotarlo apenas producción efectivamente lo manda.
-  function noEnviadoHtml(it){
-    var html = '<div class="idr-readonly">No se envió'+(it.motivo?' — <b>'+esc(it.motivo)+'</b>':'')+(it.fechaEstimada?' (estimado: '+esc(fmtDate(it.fechaEstimada))+')':'')+'</div>';
-    html += '<div class="idr-controls" style="margin-top:8px">';
-    html += '<input class="qty-input" type="text" inputmode="numeric" placeholder="cant." data-reenvio-qty="'+esc(it.id)+'">';
-    html += '<button class="btn btn-ghost btn-sm" data-reenviar="'+esc(it.id)+'" type="button">Ya se mandó</button>';
-    html += '</div>';
-    return html;
+  // Helper: read hours from col horasCol (Excel time fraction) or compute from ingreso-salida
+  function getHs(row,horasCol,ingCol,salCol){
+    const hv=row[horasCol];
+    // Cached formula result: time fraction between 0 and ~0.7 (max ~16h)
+    if(typeof hv==='number'&&hv>0&&hv<0.7)return hv*24;
+    // Fallback: compute from ingreso - salida
+    const ing=typeof row[ingCol]==='number'?row[ingCol]%1:null;
+    const sal=typeof row[salCol]==='number'?row[salCol]%1:null;
+    if(ing===null||sal===null)return 0;
+    let h=(sal-ing)*24;
+    if(h<=0)h+=24; // midnight crossing
+    return(h>0&&h<16)?h:0;
   }
 
-  // ---------- TAB: detalle de pedido (envío) ----------
-  function renderDetail(main, id){
-    var p = pedidos.find(function(x){ return x.id===id; });
-    if(!p){ state.detailId = null; return renderLista(main); }
-    // Tres etapas según el estado del pedido:
-    //  "pendiente" -> producción arma y marca qué se envía (o no)
-    //  "enviado"   -> el local confirma qué recibió realmente
-    //  "cerrado"   -> ya está todo confirmado, solo se muestra un resumen
-    var mode = p.estado==="pendiente" ? "envio" : (p.estado==="enviado" ? "recepcion" : "resumen");
-
-    if(!state.editForm || state.editForm._id!==id || state.editForm._mode!==mode){
-      state.editForm = {
-        _id: id,
-        _mode: mode,
-        quienNombre: mode==="envio" ? lsGet("dc_quien_envia","") : (mode==="recepcion" ? lsGet("dc_quien_recibe","") : ""),
-        items: (p.items||[]).map(function(it){
-          return {
-            id:it.id, category:it.category, name:it.name, isExtra:!!it.isExtra,
-            pedidoCant: it.pedidoCant, envioCant: it.envioCant||"",
-            recibidoCant: it.recibidoCant||"",
-            noEnviado: it.estadoItem==="no_enviado",
-            motivo: it.motivo||"", fechaEstimada: it.fechaEstimada||""
-          };
-        })
-      };
-    }
-    var f = state.editForm;
-    var byCat = {};
-    CATEGORIES.forEach(function(c){ byCat[c.key]=[]; });
-    f.items.forEach(function(it){ (byCat[it.category]=byCat[it.category]||[]).push(it); });
-
-    var html = '<div class="panel">';
-    html += '<div class="detail-head">';
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">';
-    html += '<button class="back" id="backBtn" type="button" style="padding-bottom:0">‹ Volver a la lista</button>';
-    html += '<button class="btn btn-ghost btn-sm" id="printBtn" type="button">🖶 Imprimir</button>';
-    html += '</div>';
-    html += '<h2 style="margin-top:8px">'+esc(LOCAL_LABEL[p.local]||p.local)+'</h2>';
-    html += '<div class="detail-grid" style="margin-top:8px">';
-    html += '<span><b>Fecha:</b> '+esc(fmtDate(p.fecha))+'</span>';
-    if(p.quienPide) html += '<span><b>Pide:</b> '+esc(p.quienPide)+'</span>';
-    if(p.enviadoPor) html += '<span><b>Envió:</b> '+esc(p.enviadoPor)+'</span>';
-    if(p.recibidoPor) html += '<span><b>Recibió:</b> '+esc(p.recibidoPor)+'</span>';
-    html += '<span><b>Cargado:</b> '+esc(fmtDateTime(p.createdAt))+'</span>';
-    html += '<span class="badge '+estadoInfo(p.estado).cls+'">'+estadoInfo(p.estado).label+'</span>';
-    html += '</div>';
-    if(p.notas) html += '<div class="detail-grid" style="margin-top:6px"><span><b>Notas:</b> '+esc(p.notas)+'</span></div>';
-    if(mode==="recepcion") html += '<div class="banner" style="margin:12px 0 0">Registrá acá lo que llegó realmente al local. Lo que falte queda en blanco.</div>';
-    if(mode==="resumen") html += '<div class="banner" style="margin:12px 0 0">Pedido cerrado: ya está confirmado lo pedido, lo enviado y lo recibido.</div>';
-    html += '</div>';
-
-    CATEGORIES.forEach(function(c){
-      var list = byCat[c.key]||[];
-      if(list.length===0) return;
-      html += '<div class="cat-block">';
-      html += '<div class="cat-title">'+esc(c.label)+'</div>';
-      list.forEach(function(it){
-        var stCls = it.noEnviado ? "st-no_enviado" : (it.envioCant.trim()!=="" ? "st-enviado" : "");
-        html += '<div class="item-detail-row '+stCls+'" data-row="'+esc(it.id)+'">';
-        html += '<div class="idr-top">';
-        html += '<div class="idr-name">'+esc(it.name)+(it.isExtra?'<span class="tag-extra">nuevo</span>':'')+'<div class="idr-pedido">Pedido: <span class="mono">'+esc(it.pedidoCant)+'</span></div></div>';
-        html += '</div>';
-
-        if(mode==="envio"){
-          html += '<div class="idr-controls">';
-          html += '<input class="qty-input" type="text" inputmode="numeric" placeholder="cant." data-envio="'+esc(it.id)+'" value="'+esc(it.envioCant)+'" '+(it.noEnviado?"disabled":"")+'>';
-          html += '<label class="chk"><input type="checkbox" data-noenv="'+esc(it.id)+'" '+(it.noEnviado?"checked":"")+'> No se envía</label>';
-          html += '</div>';
-          if(it.noEnviado){
-            html += '<div class="idr-motivo">';
-            html += '<input type="text" placeholder="Motivo (ej: sin stock)" data-motivo="'+esc(it.id)+'" value="'+esc(it.motivo)+'">';
-            html += '<input type="date" data-festimada="'+esc(it.id)+'" value="'+esc(it.fechaEstimada)+'">';
-            html += '</div>';
-          }
-        } else if(mode==="recepcion"){
-          if(it.noEnviado){
-            html += noEnviadoHtml(it);
-          } else {
-            html += '<div class="idr-controls">';
-            html += '<span class="idr-readonly">Enviado: <b>'+esc(it.envioCant)+'</b></span>';
-            html += '<input class="qty-input" type="text" inputmode="numeric" placeholder="cant." data-recibido="'+esc(it.id)+'" value="'+esc(it.recibidoCant)+'">';
-            html += '<span class="idr-readonly">recibido</span>';
-            html += '</div>';
-          }
-        } else {
-          if(it.noEnviado){
-            html += noEnviadoHtml(it);
-          } else {
-            html += '<div class="idr-readonly">Enviado: <b>'+esc(it.envioCant||"—")+'</b> &nbsp;·&nbsp; Recibido: <b>'+esc(it.recibidoCant||"—")+'</b></div>';
-          }
-        }
-        html += '</div>';
-      });
-      html += '</div>';
-    });
-
-    if(mode!=="resumen"){
-      html += '<div class="panel-body" style="border-top:1px dashed var(--border-strong)">';
-      html += fieldInput(mode==="envio"?"¿Quién envía?":"¿Quién recibe?", "quienNombre", "text", f.quienNombre);
-      html += '</div>';
-      html += '<div class="panel-body save-bar">';
-      html += '<button class="btn btn-primary btn-block" id="saveDetail" type="button">'+(mode==="envio"?"Guardar envío":"Confirmar recepción")+'</button>';
-      html += '</div>';
-    }
-    html += '</div>';
-
-    main.innerHTML = html;
-
-    main.querySelector("#backBtn").addEventListener("click", function(){
-      state.detailId = null; state.editForm = null; render();
-    });
-    main.querySelector("#printBtn").addEventListener("click", function(){ printPedido(p); });
-    main.querySelectorAll("[data-envio]").forEach(function(inp){
-      inp.addEventListener("input", function(){
-        var id = inp.getAttribute("data-envio");
-        var it = f.items.find(function(x){return x.id===id;});
-        if(it) it.envioCant = inp.value;
-      });
-    });
-    main.querySelectorAll("[data-recibido]").forEach(function(inp){
-      inp.addEventListener("input", function(){
-        var id = inp.getAttribute("data-recibido");
-        var it = f.items.find(function(x){return x.id===id;});
-        if(it) it.recibidoCant = inp.value;
-      });
-    });
-    main.querySelectorAll("[data-noenv]").forEach(function(chk){
-      chk.addEventListener("change", function(){
-        var id = chk.getAttribute("data-noenv");
-        var it = f.items.find(function(x){return x.id===id;});
-        if(it){ it.noEnviado = chk.checked; if(chk.checked) it.envioCant=""; }
-        renderDetail(main, state.detailId);
-      });
-    });
-    main.querySelectorAll("[data-motivo]").forEach(function(inp){
-      inp.addEventListener("input", function(){
-        var id = inp.getAttribute("data-motivo");
-        var it = f.items.find(function(x){return x.id===id;});
-        if(it) it.motivo = inp.value;
-      });
-    });
-    main.querySelectorAll("[data-festimada]").forEach(function(inp){
-      inp.addEventListener("change", function(){
-        var id = inp.getAttribute("data-festimada");
-        var it = f.items.find(function(x){return x.id===id;});
-        if(it) it.fechaEstimada = inp.value;
-      });
-    });
-    var quienInp = main.querySelector("#quienNombre");
-    if(quienInp) quienInp.addEventListener("input", function(e){ f.quienNombre = e.target.value; });
-    var saveBtn = main.querySelector("#saveDetail");
-    if(saveBtn) saveBtn.addEventListener("click", function(){ saveDetail(p, mode); });
-
-    main.querySelectorAll("[data-reenviar]").forEach(function(btn){
-      btn.addEventListener("click", function(){
-        var id = btn.getAttribute("data-reenviar");
-        var qtyInp = main.querySelector('[data-reenvio-qty="'+id+'"]');
-        var qty = qtyInp ? qtyInp.value.trim() : "";
-        if(!qty){ toast("Cargá la cantidad que se manda"); if(qtyInp) qtyInp.focus(); return; }
-        btn.disabled = true;
-        callServer("reenviarItem", {pedidoId:p.id, itemId:id, envioCant:qty}).then(function(){
-          toast("Ítem reenviado. El pedido vuelve a esperar recepción.");
-          state.editForm = null;
-          loadData(true);
-        }).catch(function(err){
-          console.error(err);
-          toast("No se pudo actualizar: "+(err&&err.message?err.message:"probá de nuevo."));
-          btn.disabled = false;
-        });
-      });
-    });
-  }
-
-  function saveDetail(p, mode){
-    var f = state.editForm;
-    var btn = document.getElementById("saveDetail");
-
-    if(mode==="envio"){
-      var items = f.items.map(function(it){
-        var estadoItem = "pendiente";
-        if(it.noEnviado){ estadoItem = "no_enviado"; }
-        else if(it.envioCant && it.envioCant.trim()!==""){ estadoItem = "enviado"; }
-        return {
-          id:it.id, envioCant:it.envioCant||"", estadoItem: estadoItem,
-          motivo: it.noEnviado ? it.motivo : "", fechaEstimada: it.noEnviado ? it.fechaEstimada : ""
-        };
-      });
-      var enviadoPor = (f.quienNombre||"").trim();
-      if(btn){ btn.disabled=true; btn.textContent="Guardando…"; }
-      callServer("updatePedidoEnvio", {pedidoId:p.id, items:items, enviadoPor:enviadoPor}).then(function(){
-        lsSet("dc_quien_envia", enviadoPor);
-        toast("Envío guardado");
-        state.editForm = null;
-        loadData(true);
-      }).catch(function(err){
-        console.error(err);
-        toast("No se pudo guardar: "+(err&&err.message?err.message:"probá de nuevo."));
-        if(btn){ btn.disabled=false; btn.textContent="Guardar envío"; }
-      });
-    } else {
-      var recItems = f.items.filter(function(it){ return !it.noEnviado; }).map(function(it){
-        return { id:it.id, cantRecibida: it.recibidoCant||"" };
-      });
-      var recibidoPor = (f.quienNombre||"").trim();
-      if(btn){ btn.disabled=true; btn.textContent="Guardando…"; }
-      callServer("updatePedidoRecepcion", {pedidoId:p.id, items:recItems, recibidoPor:recibidoPor}).then(function(){
-        lsSet("dc_quien_recibe", recibidoPor);
-        toast("Recepción guardada");
-        state.editForm = null;
-        loadData(true);
-      }).catch(function(err){
-        console.error(err);
-        toast("No se pudo guardar: "+(err&&err.message?err.message:"probá de nuevo."));
-        if(btn){ btn.disabled=false; btn.textContent="Confirmar recepción"; }
-      });
-    }
-  }
-
-  // ---------- imprimir pedido (para armar en depósito) ----------
-  function printPedido(p){
-    var byCat = groupByCategory(p.items||[]);
-    var html = '<h1>Pedido de Insumos — '+esc(LOCAL_LABEL[p.local]||p.local)+'</h1>';
-    html += '<div class="ps-meta">Fecha: '+esc(fmtDate(p.fecha))+(p.quienPide?' &nbsp;·&nbsp; Pide: '+esc(p.quienPide):'')+'</div>';
-    if(p.notas) html += '<div class="ps-meta">Notas: '+esc(p.notas)+'</div>';
-    CATEGORIES.forEach(function(c){
-      var list = (byCat[c.key]||[]).filter(function(it){ return it.pedidoCant && String(it.pedidoCant).trim()!==""; });
-      if(list.length===0) return;
-      html += '<div class="ps-cat">'+esc(c.label)+'</div>';
-      list.forEach(function(it){
-        html += '<div class="ps-item"><span class="ps-check"></span><span class="ps-name">'+esc(it.name)+(it.isExtra?' (nuevo)':'')+'</span><span class="ps-qty">'+esc(it.pedidoCant)+'</span></div>';
-      });
-    });
-    html += '<div class="ps-meta" style="margin-top:22px">Preparado por: _______________________ &nbsp;&nbsp; Fecha: ___/___/___</div>';
-    var sheet = document.getElementById("printSheet");
-    sheet.innerHTML = html;
-    window.print();
-  }
-
-  // ---------- TAB: catálogo (protegido con clave) ----------
-  function permMsg(err, action){
-    if(err && err.message && err.message.indexOf("PERMISO_DENEGADO")!==-1){
-      return "Clave incorrecta: la edición del catálogo está restringida.";
-    }
-    return "No se pudo "+action+". Probá de nuevo.";
-  }
-
-  var adminPassword_ = null; // solo en memoria; se pierde al recargar la página
-
-  function renderCatalogo(main){
-    var byCat = groupByCategory(catalogItems);
-    var unlocked = state.adminUnlocked;
-    var html = '';
-
-    if(!unlocked){
-      html += '<div style="display:flex;justify-content:flex-end;margin-bottom:14px">'+
-        '<button class="btn btn-ghost btn-sm" id="unlockCatalog" type="button">🔒 Editar catálogo</button>'+
-        '</div>';
-    } else {
-      html += '<div class="banner" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">'+
-        '<span>Modo edición activo. Los cambios aplican a los <b>próximos</b> pedidos; los ya cargados no se modifican.</span>'+
-        '<button class="btn btn-ghost btn-sm" id="lockCatalog" type="button">Salir del modo edición</button>'+
-        '</div>';
-    }
-
-    CATEGORIES.forEach(function(c){
-      var list = byCat[c.key].slice().sort(function(a,b){ return (a.order||0)-(b.order||0) || a.name.localeCompare(b.name); });
-      html += '<div class="panel"><div class="cat-block">';
-      html += '<div class="cat-title">'+esc(c.label)+' <span class="mono" style="font-weight:500;opacity:.7">('+list.length+')</span></div>';
-      list.forEach(function(it, idx){
-        html += '<div class="catalog-item">';
-        html += '<div class="ci-name">'+esc(it.name)+'</div>';
-        if(unlocked){
-          html += '<div class="ci-controls">';
-          html += '<button class="rm-btn" data-move-up="'+it.id+'" title="Subir" type="button" '+(idx===0?"disabled":"")+'>↑</button>';
-          html += '<button class="rm-btn" data-move-down="'+it.id+'" title="Bajar" type="button" '+(idx===list.length-1?"disabled":"")+'>↓</button>';
-          html += '<select class="ci-cat-select" data-move-cat="'+it.id+'" title="Cambiar de categoría">';
-          CATEGORIES.forEach(function(c2){
-            html += '<option value="'+c2.key+'"'+(c2.key===c.key?" selected":"")+'>'+esc(c2.label)+'</option>';
-          });
-          html += '</select>';
-          html += '<button class="rm-btn" data-del-item="'+it.id+'" title="Eliminar" type="button">×</button>';
-          html += '</div>';
-        }
-        html += '</div>';
-      });
-      if(unlocked){
-        html += '<div class="catalog-add">';
-        html += '<input type="text" placeholder="Nuevo ítem en '+esc(c.label)+'…" data-newcat="'+c.key+'">';
-        html += '<button class="btn btn-ghost btn-sm" data-addcat="'+c.key+'" type="button">+ Agregar</button>';
-        html += '</div>';
+  // LOCAL sheets
+  for(const local of LOCALS){
+    const sn=wb.SheetNames.find(n=>n.toUpperCase().includes(local.toUpperCase()));
+    if(!sn)continue;
+    const rows=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,raw:true,defval:''});
+    if(rows.length<3)continue;
+    const rightType=rows[0][7]?String(rows[0][7]).trim().toUpperCase():null;
+    for(let r=2;r<rows.length;r++){
+      const row=rows[r];
+      // Left section: CadeteYa — col 4=horas, col 2=ingreso, col 3=salida
+      if(row[2]||row[4]){
+        const hs=getHs(row,4,2,3);
+        if(hs>0)out.byLocal[local].hsCY+=hs;
       }
-      html += '</div></div>';
-    });
-    main.innerHTML = html;
-
-    var unlockBtn = document.getElementById("unlockCatalog");
-    if(unlockBtn){
-      unlockBtn.addEventListener("click", function(){
-        var pass = window.prompt("Clave para editar el catálogo:");
-        if(pass==null) return;
-        unlockBtn.disabled = true;
-        callServer("checkAdmin", {password:pass}).then(function(res){
-          if(res && res.ok){
-            adminPassword_ = pass;
-            state.adminUnlocked = true;
-            renderCatalogo(main);
-          } else {
-            toast("Clave incorrecta.");
-            unlockBtn.disabled = false;
-          }
-        }).catch(function(err){ console.error(err); toast("No se pudo verificar la clave."); unlockBtn.disabled=false; });
-      });
+      // Right section: Squad or Elsa — col 11=horas, col 9=ingreso, col 10=salida
+      if(rightType&&(row[9]||row[11])){
+        const hs=getHs(row,11,9,10);
+        if(hs>0){
+          if(rightType==='SQUAD')out.byLocal[local].hsSquad=(out.byLocal[local].hsSquad||0)+hs;
+          else if(rightType==='ELSA')out.byLocal[local].hsElsa=(out.byLocal[local].hsElsa||0)+hs;
+        }
+      }
     }
-    var lockBtn = document.getElementById("lockCatalog");
-    if(lockBtn){
-      lockBtn.addEventListener("click", function(){
-        adminPassword_ = null;
-        state.adminUnlocked = false;
-        renderCatalogo(main);
-      });
-    }
+  }
+  return out;
+}
 
-    main.querySelectorAll("[data-del-item]").forEach(function(btn){
-      btn.addEventListener("click", function(){
-        var id = btn.getAttribute("data-del-item");
-        callServer("deleteCatalogItem", {id:id, password:adminPassword_}).then(function(){
-          toast("Ítem eliminado");
-          loadData(true);
-        }).catch(function(err){ console.error(err); toast(permMsg(err, "eliminar")); });
-      });
+function loadHoras(evt){
+  const f=evt.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      horasData=processHorasFile(e.target.result);
+      const dz=document.getElementById('dz-horas');
+      dz.classList.add('ok');
+      dz.querySelector('.ic').textContent='✅';
+      dz.querySelector('.ht').textContent=f.name;
+      // Show parsed summary
+      const bl=horasData.byLocal;
+      const fmt=n=>fmN(n,1);
+      const pEl=document.getElementById('horas-parsed');
+      pEl.style.display='block';
+      pEl.innerHTML=`
+        <strong>Zelarrayan</strong> — CY: ${fmt(bl.Zelarrayan.hsCY)} hs<br>
+        <strong>Centro</strong> — CY: ${fmt(bl.Centro.hsCY)} hs · Squad: ${fmt(bl.Centro.hsSquad||0)} hs<br>
+        <strong>Patagonia</strong> — CY: ${fmt(bl.Patagonia.hsCY)} hs · Elsa: ${fmt(bl.Patagonia.hsElsa||0)} hs<br>
+        <strong>Valor hora:</strong> ${fm$(horasData.vh)} · Extras: CY ${fm$(horasData.extCY)} · RB ${fm$(horasData.extRB)} · UB ${fm$(horasData.extUB)}`;
+      // Hide manual section
+      document.getElementById('del-manual-section').style.display='none';
+    }catch(err){
+      document.getElementById('errmsg').textContent='Error al leer planilla de horas: '+err.message;
+    }
+  };
+  r.readAsBinaryString(f);
+}
+
+// ======== FILE HANDLERS ========
+const dzMap={Zelarrayan:'dz-z',Centro:'dz-c',Patagonia:'dz-p'};
+function loadXLS(evt,local){
+  const f=evt.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    files[local]={name:f.name,data:e.target.result};
+    const dz=document.getElementById(dzMap[local]);
+    dz.classList.add('ok');
+    dz.querySelector('.ic').textContent='✅';
+    dz.querySelector('.ht').textContent=f.name;
+    checkReady();
+  };
+  r.readAsBinaryString(f);
+}
+function loadCost(evt){
+  const f=evt.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    costData=processCostFile(e.target.result);
+    const dz=document.getElementById('dz-cost');
+    const n=Object.keys(costData).length;
+    dz.classList.toggle('ok',n>0);
+    dz.querySelector('.ic').textContent=n>0?'✅':'⚠️';
+    dz.querySelector('.ht').textContent=n>0
+      ? f.name+' — '+n+' productos cargados'
+      : '⚠ No se encontraron costos. Verificá que el archivo sea el correcto (costos productos.xlsx)';
+  };
+  r.readAsBinaryString(f);
+}
+function fillFormsFromData(data){
+  // Pre-completa los campos del formulario con los valores guardados
+  // Soporta formato nuevo (periods) y antiguo
+  const src=data?.periods?data:data;
+  const di=(src?.deliveryInputs||src?.periods?.[src?.periodOrder?.[src?.periodOrder?.length-1]]?.deliveryInputs)?.byLocal||{};
+  const _s=(id,v)=>{const el=document.getElementById(id);if(el&&v)el.value=v;};
+  _s('inp-z-cy',di.Zelarrayan?.cy);_s('inp-z-sq',di.Zelarrayan?.sq);
+  _s('inp-z-ecy',di.Zelarrayan?.extCY);_s('inp-z-erb',di.Zelarrayan?.extRB);_s('inp-z-eub',di.Zelarrayan?.extUB);
+  _s('inp-c-cy',di.Centro?.cy);_s('inp-c-sq',di.Centro?.sq);
+  _s('inp-c-ecy',di.Centro?.extCY);_s('inp-c-erb',di.Centro?.extRB);_s('inp-c-eub',di.Centro?.extUB);
+  _s('inp-p-cy',di.Patagonia?.cy);_s('inp-p-sq',di.Patagonia?.sq);_s('inp-p-el',di.Patagonia?.el);
+  _s('inp-p-ecy',di.Patagonia?.extCY);_s('inp-p-erb',di.Patagonia?.extRB);_s('inp-p-eub',di.Patagonia?.extUB);
+  if(data?.elSabor)_s('inp-ed-name',data.elSabor);
+  if(data?.deliveryInputs?.edCost)_s('inp-ed-cost',data.deliveryInputs.edCost);
+}
+function loadHist(evt){
+  const f=evt.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const parsed=JSON.parse(e.target.result);
+      if(!parsed.global||!parsed.locals)throw new Error('JSON inválido');
+      histData=parsed;
+      fillFormsFromData(parsed);
+      document.getElementById('hist-status').style.display='block';
+      document.getElementById('hist-label').textContent=parsed.period||f.name;
+      document.getElementById('btn-hist').textContent='✅ '+f.name;
+    }catch(err){
+      document.getElementById('errmsg').textContent='Error al cargar histórico: '+err.message;
+    }
+  };
+  r.readAsText(f);
+}
+function checkReady(){
+  document.getElementById('btn-go').disabled=!LOCALS.every(l=>files[l]);
+}
+
+// ======== MAIN BUILD ========
+function buildDash(){
+  document.getElementById('errmsg').textContent='';
+  document.getElementById('btn-go').disabled=true;
+  document.getElementById('btn-go').textContent='Procesando…';
+  setTimeout(()=>{
+    try{
+      const edName=document.getElementById('inp-ed-name').value.trim();
+      const edCost=parseFloat(document.getElementById('inp-ed-cost').value)||null;
+      const _g=id=>parseFloat(document.getElementById(id)?.value)||0;
+      const deliveryInputs={
+        edCost:edCost||null,
+        byLocal:{
+          Zelarrayan:{cy:_g('inp-z-cy'),sq:_g('inp-z-sq'),el:0,
+            extCY:_g('inp-z-ecy'),extRB:_g('inp-z-erb'),extUB:_g('inp-z-eub')},
+          Centro:{cy:_g('inp-c-cy'),sq:_g('inp-c-sq'),el:0,
+            extCY:_g('inp-c-ecy'),extRB:_g('inp-c-erb'),extUB:_g('inp-c-eub')},
+          Patagonia:{cy:_g('inp-p-cy'),sq:_g('inp-p-sq'),el:_g('inp-p-el'),
+            extCY:_g('inp-p-ecy'),extRB:_g('inp-p-erb'),extUB:_g('inp-p-eub')}
+        }
+      };
+      const elSabor=edName||'';
+      const locals=LOCALS.map(n=>processLocal(n,files[n].data,costData,edName,edCost));
+      const global=buildGlobal(locals);
+      const period=document.getElementById('inp-period').value.trim()||global.period;
+      const currData={global,locals,period,deliveryInputs,elSabor};
+
+      // Multi-period storage
+      let periods={};let periodOrder=[];
+      if(histData){
+        const norm=normalizeAppData(histData);
+        periods={...norm.periods};
+        periodOrder=[...(norm.periodOrder||Object.keys(norm.periods))];
+      }
+      if(periods[period]){
+        // Mismo período → reemplazar (siempre se sube el mes completo acumulado)
+        periods[period]=currData;
+      }else{
+        // Período nuevo → agregar como mes independiente
+        periods[period]=currData;
+        periodOrder.push(period);
+      }
+      // Ordenar cronológicamente por mes/año
+      const MESES_ES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+      function periodScore(p){
+        const m=p.toLowerCase().match(/(\w+)\s+(\d{4})/);
+        if(!m)return 99999;
+        const mi=MESES_ES.indexOf(m[1]);
+        return parseInt(m[2])*12+(mi>=0?mi:99);
+      }
+      periodOrder.sort((a,b)=>periodScore(a)-periodScore(b));
+      appData={periods,periodOrder,deliveryInputs,elSabor};
+      curPeriod=period;
+      showDash();
+    }catch(err){
+      document.getElementById('errmsg').textContent='Error al procesar: '+err.message;
+      document.getElementById('btn-go').disabled=false;
+      document.getElementById('btn-go').textContent='Generar tablero →';
+      console.error(err);
+    }
+  },50);
+}
+
+function showDash(){
+  const csBtn=document.getElementById('btn-cloud-save');
+  if(csBtn)csBtn.style.display=localStorage.getItem('doma_cloud_url')?'':'none';
+  // Normalizar por si viene de formato antiguo
+  if(!appData.periods)appData=normalizeAppData(appData);
+  const order=appData.periodOrder||Object.keys(appData.periods);
+  if(!curPeriod||!appData.periods[curPeriod])curPeriod=order[order.length-1];
+  // Selector de períodos
+  let ph='';
+  order.forEach(p=>{ph+=`<div class="ltab${p===curPeriod?' active':''}" onclick="switchPeriod('${p}')" title="Clic para ver · Doble clic para renombrar" ondblclick="renamePeriod('${p}')">${p}</div>`});
+  document.getElementById('ltabs').innerHTML=ph;
+  // Local tabs
+  buildLocalTabs();
+  // Section tabs
+  let sh='';
+  SECS.forEach(s=>{sh+=`<div class="stab${s.id===curSec?' active':''}" data-sec="${s.id}" onclick="switchSec('${s.id}')">${s.lb}</div>`});
+  document.getElementById('stabs').innerHTML=sh;
+  document.getElementById('top-pd').textContent='Período: '+curPeriod;
+  document.getElementById('upl').style.display='none';
+  document.getElementById('dash').style.display='block';
+  renderContent();
+}
+function buildLocalTabs(){
+  // Ocultar tabs de locales en Evolución; mostrar en otras solapas
+  const pd=getActivePd();if(!pd)return;
+  const tabs=['Global',...LOCALS];
+  const ltEl=document.getElementById('ltabs');
+  // Si ya tiene los períodos, añadimos los locales como fila debajo — no, mejor los integramos en ltabs cuando no es Evolución
+  // En Evolución no se muestran locales; en el resto sí mediante un div separado
+  let lh='';
+  if(curSec!=='evolucion'){
+    lh='<div style="display:flex;gap:2px;border-top:1px solid var(--BD);padding-top:2px;margin-top:2px">';
+    tabs.forEach((t,i)=>{lh+=`<div class="stab${i===curTab?' active':''}" style="font-size:11px" onclick="switchTab(${i})">${t}</div>`});
+    lh+='</div>';
+  }
+  document.getElementById('local-tabs').innerHTML=lh;
+}
+
+function renamePeriod(oldName){
+  const newName=prompt('Renombrar período:',oldName);
+  if(!newName||newName===oldName)return;
+  const trimmed=newName.trim();
+  if(!trimmed)return;
+  if(appData.periods[trimmed]){alert('Ya existe un período con ese nombre.');return;}
+  // Renombrar clave en periods
+  appData.periods[trimmed]=appData.periods[oldName];
+  appData.periods[trimmed].period=trimmed;
+  delete appData.periods[oldName];
+  // Actualizar periodOrder
+  const idx=appData.periodOrder.indexOf(oldName);
+  if(idx>=0)appData.periodOrder[idx]=trimmed;
+  if(curPeriod===oldName)curPeriod=trimmed;
+  showDash();
+}
+function switchPeriod(p){
+  curPeriod=p;curTab=0;curResSub=0;
+  const order=appData.periodOrder||Object.keys(appData.periods);
+  document.querySelectorAll('#ltabs .ltab').forEach(t=>t.classList.toggle('active',t.textContent===p));
+  document.getElementById('top-pd').textContent='Período: '+curPeriod;
+  buildLocalTabs();
+  renderContent();
+}
+function switchTab(i){
+  curTab=i;curResSub=0;
+  buildLocalTabs();
+  renderContent();
+}
+function switchSec(sec){
+  curSec=sec;if(sec==='resumen')curResSub=0;
+  document.querySelectorAll('.stab').forEach(t=>t.classList.toggle('active',t.dataset.sec===sec));
+  buildLocalTabs();
+  renderContent();
+}
+function renderContent(){
+  if(curSec==='evolucion'){
+    document.getElementById('cnt').innerHTML=renderEvolucion();
+  }else{
+    const pd=getActivePd();
+    if(!pd){document.getElementById('cnt').innerHTML='<p style="padding:20px;color:var(--GR)">Sin datos para este período.</p>';return;}
+    const D=curTab===0?pd.global:pd.locals[curTab-1];
+    try{
+      document.getElementById('cnt').innerHTML=renderSec(curSec,D,pd.locals);
+    }catch(e){
+      document.getElementById('cnt').innerHTML=`<div style="padding:20px;background:#fff3f3;border:2px solid #c62828;border-radius:8px;margin:16px"><strong style="color:#c62828">Error al renderizar pestaña "${curSec}":</strong><br><code style="font-size:12px;color:#333">${e.message}</code><br><pre style="font-size:11px;color:#555;margin-top:8px;white-space:pre-wrap">${e.stack}</pre></div>`;
+    }
+  }
+  document.getElementById('cnt').scrollTop=0;
+  window.scrollTo(0,0);
+}
+
+// ======== EVOLUCIÓN (comparativo multi-período) ========
+function renderEvolucion(){
+  if(!appData?.periods)return'<p style="padding:20px;color:var(--GR)">Sin datos. Cargá al menos un mes.</p>';
+  const order=appData.periodOrder||Object.keys(appData.periods);
+  if(order.length<1)return'<p style="padding:20px;color:var(--GR)">Sin datos suficientes.</p>';
+
+  const pds=order.map(p=>appData.periods[p]);
+  const pct=(a,b)=>{if(!b)return'';const d=(a-b)/b*100;const s=d>=0?'+':'';const col=d>=0?'var(--GN)':'#c62828';return`<span style="font-size:10px;color:${col};margin-left:4px">${s}${d.toFixed(1)}%</span>`;};
+  const mon=v=>'$'+Math.round(v||0).toLocaleString('es-AR');
+  const num=v=>Math.round(v||0).toLocaleString('es-AR');
+  const dec=v=>(+(v||0)).toFixed(1);
+
+  // Encabezados
+  let h=`<div class="cnt"><div class="sec"><div class="st">📈 Evolución mensual — Global</div>`;
+  h+=`<div class="tw"><table><thead><tr><th>Métrica</th>`;
+  order.forEach(p=>{h+=`<th class="r">${p}</th>`});
+  h+=`</tr></thead><tbody>`;
+
+  const metRow=(lbl,fn)=>{
+    let r=`<tr class="dr"><td style="font-weight:600">${lbl}</td>`;
+    pds.forEach((pd,i)=>{
+      const v=fn(pd);
+      const prev=i>0?fn(pds[i-1]):null;
+      r+=`<td class="r">${typeof v==='number'?mon(v):v}${prev!=null&&typeof v==='number'?pct(v,prev):''}</td>`;
     });
-    main.querySelectorAll("[data-move-up]").forEach(function(btn){
-      btn.addEventListener("click", function(){
-        if(btn.disabled) return;
-        var id = btn.getAttribute("data-move-up");
-        callServer("moveCatalogItem", {id:id, direction:"up", password:adminPassword_}).then(function(){
-          loadData(true);
-        }).catch(function(err){ console.error(err); toast(permMsg(err, "mover")); });
-      });
+    return r+'</tr>';
+  };
+  const numRow=(lbl,fn)=>{
+    let r=`<tr class="dr"><td style="font-weight:600">${lbl}</td>`;
+    pds.forEach((pd,i)=>{
+      const v=fn(pd);
+      const prev=i>0?fn(pds[i-1]):null;
+      r+=`<td class="r">${num(v)}${prev!=null?pct(v,prev):''}</td>`;
     });
-    main.querySelectorAll("[data-move-down]").forEach(function(btn){
-      btn.addEventListener("click", function(){
-        if(btn.disabled) return;
-        var id = btn.getAttribute("data-move-down");
-        callServer("moveCatalogItem", {id:id, direction:"down", password:adminPassword_}).then(function(){
-          loadData(true);
-        }).catch(function(err){ console.error(err); toast(permMsg(err, "mover")); });
-      });
+    return r+'</tr>';
+  };
+  const decRow=(lbl,fn)=>{
+    let r=`<tr class="dr"><td style="font-weight:600">${lbl}</td>`;
+    pds.forEach((pd,i)=>{
+      const v=fn(pd);
+      const prev=i>0?fn(pds[i-1]):null;
+      r+=`<td class="r">${dec(v)}${prev!=null?pct(v,prev):''}</td>`;
     });
-    main.querySelectorAll("[data-move-cat]").forEach(function(sel){
-      sel.addEventListener("change", function(){
-        var id = sel.getAttribute("data-move-cat");
-        var categoria = sel.value;
-        callServer("setCatalogItemCategory", {id:id, categoria:categoria, password:adminPassword_}).then(function(){
-          toast("Ítem movido de categoría");
-          loadData(true);
-        }).catch(function(err){ console.error(err); toast(permMsg(err, "mover")); renderCatalogo(main); });
-      });
+    return r+'</tr>';
+  };
+
+  // Global
+  h+=`<tr><td colspan="${order.length+1}" style="background:var(--M);color:var(--CR);font-size:10px;font-weight:700;text-transform:uppercase;padding:6px 9px;letter-spacing:.5px">Global</td></tr>`;
+  h+=metRow('Ventas',pd=>pd.global?.totalVentas||0);
+  h+=numRow('Pedidos',pd=>pd.global?.totalPedidos||0);
+  h+=numRow('Productos',pd=>pd.global?.totalProductos||0);
+  h+=decRow('Ticket promedio',pd=>pd.global?.ticketProm||0);
+  h+=decRow('Prod. por ticket',pd=>pd.global?.prodPorTicket||0);
+
+  // Por local
+  LOCALS.forEach((nm,li)=>{
+    h+=`<tr><td colspan="${order.length+1}" style="background:var(--GL);color:var(--GR);font-size:10px;font-weight:700;text-transform:uppercase;padding:5px 9px;border-top:2px solid var(--BD)">${nm}</td></tr>`;
+    h+=metRow('Ventas',pd=>pd.locals?.[li]?.totalVentas||0);
+    h+=numRow('Pedidos',pd=>pd.locals?.[li]?.totalPedidos||0);
+    h+=numRow('Productos',pd=>pd.locals?.[li]?.totalProductos||0);
+    h+=decRow('Ticket promedio',pd=>pd.locals?.[li]?.ticketProm||0);
+  });
+
+  // Por canal (global)
+  h+=`<tr><td colspan="${order.length+1}" style="background:var(--GL);color:var(--GR);font-size:10px;font-weight:700;text-transform:uppercase;padding:5px 9px;border-top:2px solid var(--BD)">Por canal — pedidos</td></tr>`;
+  ['Mostrador','PedidosYa','Delivery'].forEach(c=>{
+    h+=numRow(c,pd=>pd.global?.canal?.[c]?.ped||0);
+  });
+  h+=`<tr><td colspan="${order.length+1}" style="background:var(--GL);color:var(--GR);font-size:10px;font-weight:700;text-transform:uppercase;padding:5px 9px;border-top:2px solid var(--BD)">Por canal — ventas ($)</td></tr>`;
+  ['Mostrador','PedidosYa','Delivery'].forEach(c=>{
+    h+=metRow(c,pd=>pd.global?.canal?.[c]?.ven||0);
+  });
+
+  h+=`</tbody></table></div>`;
+  if(order.length===1)h+=`<p class="note" style="margin-top:8px">Cargá más meses para ver la evolución y variación porcentual.</p>`;
+  h+=`</div></div>`;
+  return h;
+}
+
+// ======== EXCEL EXPORT ========
+function exportExcel(){
+  if(!appData?.periods){alert('No hay datos para exportar');return;}
+  const order=appData.periodOrder||Object.keys(appData.periods);
+  const pds=order.map(p=>({name:p,...appData.periods[p]}));
+  const wb=XLSX.utils.book_new();
+  const pct=(a,b)=>b?(((a-b)/b)*100).toFixed(1)+'%':'';
+
+  // ── HOJA 1: Evolución ──
+  const evo=[['Métrica',...order]];
+  const addRow=(lbl,fn)=>{
+    const row=[lbl];
+    pds.forEach((pd,i)=>{
+      row.push(fn(pd)||0);
+      if(i>0)row.push(pct(fn(pd)||0,fn(pds[i-1])||0));
+      else row.push('');
     });
-    main.querySelectorAll("[data-addcat]").forEach(function(btn){
-      btn.addEventListener("click", function(){
-        var cat = btn.getAttribute("data-addcat");
-        var input = main.querySelector('[data-newcat="'+cat+'"]');
-        var name = (input.value||"").trim();
-        if(!name){ input.focus(); return; }
-        callServer("addCatalogItem", {categoria:cat, nombre:name, password:adminPassword_}).then(function(){
-          input.value="";
-          toast("Ítem agregado");
-          loadData(true);
-        }).catch(function(err){ console.error(err); toast(permMsg(err, "agregar")); });
-      });
+    evo.push(row);
+  };
+  // encabezados con col de variación por cada mes
+  const eHdr=['Métrica'];
+  order.forEach((p,i)=>{eHdr.push(p);eHdr.push(i>0?'% vs anterior':'');});
+  evo[0]=eHdr;
+
+  evo.push(['── GLOBAL ──']);
+  addRow('Ventas ($)',pd=>pd.global?.totalVentas||0);
+  addRow('Pedidos',pd=>pd.global?.totalPedidos||0);
+  addRow('Productos',pd=>pd.global?.totalProductos||0);
+  addRow('Ticket promedio',pd=>+(pd.global?.ticketProm||0).toFixed(1));
+  addRow('Prod. por ticket',pd=>+(pd.global?.prodPorTicket||0).toFixed(1));
+
+  LOCALS.forEach((nm,li)=>{
+    evo.push([`── ${nm} ──`]);
+    addRow('Ventas ($)',pd=>pd.locals?.[li]?.totalVentas||0);
+    addRow('Pedidos',pd=>pd.locals?.[li]?.totalPedidos||0);
+    addRow('Productos',pd=>pd.locals?.[li]?.totalProductos||0);
+    addRow('Ticket prom.',pd=>+(pd.locals?.[li]?.ticketProm||0).toFixed(1));
+  });
+
+  evo.push(['── CANAL — Pedidos ──']);
+  ['Mostrador','PedidosYa','Delivery'].forEach(c=>{
+    addRow(c,pd=>pd.global?.canal?.[c]?.ped||0);
+  });
+  evo.push(['── CANAL — Ventas ($) ──']);
+  ['Mostrador','PedidosYa','Delivery'].forEach(c=>{
+    addRow(c,pd=>pd.global?.canal?.[c]?.ven||0);
+  });
+  evo.push(['── TURNOS — Pedidos ──']);
+  ['Mediodía','Noche'].forEach(t=>{
+    addRow(t,pd=>pd.global?.byTurno?.[t]?.ped||0);
+  });
+  evo.push(['── TURNOS — Ventas ($) ──']);
+  ['Mediodía','Noche'].forEach(t=>{
+    addRow(t,pd=>pd.global?.byTurno?.[t]?.ven||0);
+  });
+
+  const wsEvo=XLSX.utils.aoa_to_sheet(evo);
+  XLSX.utils.book_append_sheet(wb,wsEvo,'Evolución');
+
+  // ── HOJA 2: Ventas por día ──
+  const dia=[['Mes','Fecha','Pedidos','Ventas ($)','Mostrador','PedidosYa','Delivery','Productos','Mediodía ped.','Noche ped.']];
+  pds.forEach(pd=>{
+    const bd=pd.global?.byDate||{};
+    Object.keys(bd).sort().forEach(f=>{
+      const d=bd[f];
+      dia.push([pd.name,f,d.ped,Math.round(d.ven),d.mos,d.py,d.del,d.prod,
+        d.td?.Mediodía?.ped||0,d.td?.Noche?.ped||0]);
     });
+  });
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(dia),'Ventas por día');
+
+  // ── HOJA 3: Por local ──
+  const loc=[['Mes','Local','Ventas ($)','Pedidos','Productos','Ticket prom.','Mostrador ped.','PedidosYa ped.','Delivery ped.']];
+  pds.forEach(pd=>{
+    LOCALS.forEach((nm,li)=>{
+      const L=pd.locals?.[li];if(!L)return;
+      loc.push([pd.name,nm,Math.round(L.totalVentas||0),L.totalPedidos||0,L.totalProductos||0,
+        +(L.ticketProm||0).toFixed(1),
+        L.canal?.Mostrador?.ped||0,L.canal?.PedidosYa?.ped||0,L.canal?.Delivery?.ped||0]);
+    });
+  });
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(loc),'Por local');
+
+  // ── HOJA 4: Productos (período seleccionado) ──
+  const selPdData=appData.periods[curPeriod]||appData.periods[order[order.length-1]];
+  const selNm=curPeriod||order[order.length-1];
+  if(selPdData?.global?.products){
+    const prods=[['Producto','Categoría','Cantidad','Ingresos ($)','Mostrador','PedidosYa','Delivery','Costo unit.']];
+    const arr=[...(selPdData.global.products)].sort((a,b)=>(b.qty||0)-(a.qty||0));
+    arr.forEach(p=>{
+      prods.push([p.name,p.cat||'',p.qty||0,Math.round(p.revenue||0),
+        p.byCanal?.Mostrador||0,p.byCanal?.PedidosYa||0,p.byCanal?.Delivery||0,
+        p.cost!=null?p.cost:'']);
+    });
+    const sheetName=('Productos '+selNm).slice(0,31);
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(prods),sheetName);
   }
 
-  // ---------- nav / refresh ----------
-  document.getElementById("tabs").addEventListener("click", function(e){
-    var btn = e.target.closest("button[data-tab]");
-    if(!btn) return;
-    state.tab = btn.getAttribute("data-tab");
-    if(state.tab!=="pedidos"){ state.detailId=null; }
-    render();
+  // ── HOJA 5: Medios de pago ──
+  const pay=[['Mes','Medio de pago','Monto ($)']];
+  pds.forEach(pd=>{
+    const pm=pd.global?.payMap||{};
+    Object.entries(pm).sort((a,b)=>b[1]-a[1]).forEach(([m,v])=>{
+      pay.push([pd.name,m,Math.round(v)]);
+    });
   });
-  document.getElementById("refreshBtn").addEventListener("click", function(){
-    loadData(false);
-  });
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(pay),'Medios de pago');
 
-  // ---------- boot ----------
-  loadData(false);
-})();
+  const fname='Doma_Criolla_'+order.join('_').replace(/[\s/]+/g,'_')+'.xlsx';
+  XLSX.writeFile(wb,fname);
+}
+
+// ======== JSON EXPORT / IMPORT ========
+function exportJSON(){
+  if(!appData)return;
+  const blob=new Blob([JSON.stringify(appData)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  const lastP=(appData.periodOrder||Object.keys(appData.periods||{})).slice(-1)[0]||appData.period||'informe';
+  a.download=`doma_${lastP.replace(/[\s/]+/g,'_')}.json`;
+  a.click();
+}
+function importJSON(evt){
+  const f=evt.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const raw=JSON.parse(e.target.result);
+      appData=migrateAliases(raw.periods?raw:normalizeAppData(raw));
+      curPeriod=null;
+      showDash();
+    }catch(err){
+      document.getElementById('errmsg').textContent='Error al importar: '+err.message;
+    }
+  };
+  r.readAsText(f);
+}
+
+// ======== CLOUD SYNC (Google Apps Script) ========
+const CLOUD_LS='doma_cloud_url';
+
+// JSONP fetch — evita el bloqueo CORS que afecta a Apps Script
+function fetchJSONP(url){
+  return new Promise((resolve,reject)=>{
+    const cb='domaJsonp_'+Date.now();
+    const script=document.createElement('script');
+    window[cb]=function(data){
+      delete window[cb];
+      if(script.parentNode)script.parentNode.removeChild(script);
+      resolve(data);
+    };
+    script.onerror=function(){
+      delete window[cb];
+      if(script.parentNode)script.parentNode.removeChild(script);
+      reject(new Error('No se pudo conectar con la nube. Verificá que el Apps Script esté publicado y la URL sea correcta.'));
+    };
+    script.src=url+(url.includes('?')?'&':'?')+'callback='+cb;
+    document.head.appendChild(script);
+  });
+}
+
+function initCloud(){
+  const url=localStorage.getItem(CLOUD_LS)||'';
+  if(url){
+    document.getElementById('inp-cloud-url').value=url;
+    document.getElementById('cloud-load-row').style.display='block';
+    document.getElementById('cloud-url-status').textContent='✅ URL configurada';
+    document.getElementById('cloud-config-label').textContent='Sincronización activa con Google Drive.';
+    document.getElementById('btn-cloud-cfg').textContent='⚙️ Cambiar URL';
+  }
+}
+
+function toggleCloudConfig(){
+  const row=document.getElementById('cloud-url-row');
+  row.style.display=row.style.display==='none'?'block':'none';
+}
+
+function saveCloudUrl(){
+  const url=document.getElementById('inp-cloud-url').value.trim();
+  if(!url||!url.includes('script.google.com')){
+    document.getElementById('cloud-url-status').style.color='#c62828';
+    document.getElementById('cloud-url-status').textContent='⚠️ La URL debe ser de Apps Script (script.google.com)';
+    return;
+  }
+  localStorage.setItem(CLOUD_LS,url);
+  document.getElementById('cloud-load-row').style.display='block';
+  document.getElementById('cloud-url-row').style.display='none';
+  document.getElementById('cloud-url-status').style.color='var(--GN)';
+  document.getElementById('cloud-url-status').textContent='✅ URL guardada — ya podés cargar y guardar en la nube';
+  document.getElementById('cloud-config-label').textContent='Sincronización activa con Google Drive.';
+  document.getElementById('btn-cloud-cfg').textContent='⚙️ Cambiar URL';
+}
+
+async function loadCloudAsHist(){
+  const url=localStorage.getItem(CLOUD_LS);
+  if(!url){alert('Configurá primero la URL del Apps Script');return;}
+  const btn=document.getElementById('btn-cloud-hist');
+  btn.textContent='⏳ Cargando...';btn.disabled=true;
+  try{
+    const data=await fetchJSONP(url);
+    if(data.error)throw new Error(data.error);
+    const normalized=migrateAliases(data.periods?data:normalizeAppData(data));
+    histData=normalized;
+    fillFormsFromData(normalized);
+    const order=normalized.periodOrder||Object.keys(normalized.periods||{});
+    document.getElementById('hist-status').style.display='block';
+    document.getElementById('hist-label').textContent=order.join(', ')||'datos cargados';
+    btn.textContent='✅ '+order.join(', ');
+  }catch(err){
+    alert('Error al cargar histórico desde la nube:\n'+err.message);
+    btn.textContent='☁️ Cargar histórico';btn.disabled=false;
+  }
+}
+async function loadFromCloud(){
+  const url=localStorage.getItem(CLOUD_LS);
+  if(!url){alert('Configurá primero la URL del Apps Script');return;}
+  const btn=document.getElementById('btn-load-cloud');
+  btn.textContent='⏳ Cargando...';btn.disabled=true;
+  try{
+    const data=await fetchJSONP(url);
+    if(data.error)throw new Error(data.error);
+    appData=migrateAliases(data.periods?data:normalizeAppData(data));
+    histData=appData;
+    curPeriod=null;
+    fillFormsFromData(appData);
+    showDash();
+  }catch(err){
+    alert('No se pudo cargar desde la nube:\n'+err.message);
+    btn.textContent='☁️ Cargar desde la nube';btn.disabled=false;
+  }
+}
+
+async function saveToCloud(){
+  const url=localStorage.getItem(CLOUD_LS);
+  if(!url){
+    alert('Configurá la URL del Apps Script en la pantalla de inicio (sección ☁️ Google Drive)');
+    return;
+  }
+  if(!appData){alert('No hay datos para guardar');return;}
+  const btn=document.getElementById('btn-cloud-save');
+
+  // Verificar si la nube tiene meses que no están en pantalla
+  btn.textContent='⏳ Verificando...';btn.disabled=true;
+  try{
+    const cloudData=await fetchJSONP(url);
+    if(!cloudData.error){
+      const cloudNorm=cloudData.periods?cloudData:normalizeAppData(cloudData);
+      const cloudOrder=cloudNorm.periodOrder||Object.keys(cloudNorm.periods||{});
+      const localOrder=appData.periodOrder||Object.keys(appData.periods||{});
+      const missing=cloudOrder.filter(p=>!localOrder.includes(p));
+      if(missing.length>0){
+        const ok=confirm(
+          '⚠️ La nube tiene '+missing.length+' mes/es que NO están en el tablero actual:\n\n'+
+          missing.join(', ')+'\n\n'+
+          'Si guardás ahora, esos meses se van a PERDER.\n\n'+
+          '¿Querés continuar de todas formas?\n'+
+          '(Cancelá para volver y cargar el histórico primero)'
+        );
+        if(!ok){btn.textContent='☁️ Guardar en la nube';btn.disabled=false;return;}
+      }
+    }
+  }catch(e){/* si no puede verificar, continúa sin bloquear */}
+
+  btn.textContent='⏳ Guardando...';
+  try{
+    await fetch(url,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify(appData)
+    });
+    btn.textContent='✅ Guardado en la nube';
+    setTimeout(()=>{btn.textContent='☁️ Guardar en la nube';btn.disabled=false;},3000);
+  }catch(err){
+    alert('Error al guardar en la nube:\n'+err.message);
+    btn.textContent='☁️ Guardar en la nube';btn.disabled=false;
+  }
+}
+
+// Init on load
+window.addEventListener('DOMContentLoaded',initCloud);
 </script>
 </body>
 </html>
