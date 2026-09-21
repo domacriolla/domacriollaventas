@@ -1324,7 +1324,7 @@ function renderVentas(D){
         <th class="sc1" style="min-width:160px;background:var(--DK);color:var(--CR)">Producto</th>
         <th class="r sc2" style="min-width:52px;background:var(--DK);color:var(--CR)">Total</th>`;
   for(const d of showDates){
-    const dow=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'][new Date(d).getDay()];
+    const dow=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'][new Date(d+'T12:00:00Z').getUTCDay()];
     const isSun=dow==='Dom',isSat=dow==='Sáb';
     const wkColor=(isSun||isSat)?'#F9A825':'var(--CR)';
     h+=`<th class="c" style="min-width:34px;background:var(--DK);color:var(--CR);font-size:9px;line-height:1.3;padding:3px 2px">${fmD(d).slice(0,5)}<br><span style="color:${wkColor};font-size:8px;font-weight:${(isSun||isSat)?'700':'400'}">${dow}</span></th>`;
