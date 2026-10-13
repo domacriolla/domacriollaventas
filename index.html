@@ -2460,8 +2460,7 @@ function showDash(){
   if(!curPeriod||!appData.periods[curPeriod])curPeriod=order[order.length-1];
   // Selector de períodos
   let ph='';
-  const multiPd=order.length>1;
-  order.forEach(p=>{ph+=`<div class="ltab${p===curPeriod?' active':''}" onclick="switchPeriod('${p}')" title="Clic para ver · Doble clic para renombrar" ondblclick="renamePeriod('${p}')" style="position:relative;padding-right:${multiPd?'18px':'8px'}">${p}${multiPd?`<span onclick="event.stopPropagation();deletePeriod('${p}')" title="Eliminar período" style="position:absolute;right:3px;top:50%;transform:translateY(-50%);font-size:10px;opacity:0.5;cursor:pointer;line-height:1" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.5'">✕</span>`:''}</div>`});
+  order.forEach(p=>{ph+=`<div class="ltab${p===curPeriod?' active':''}" onclick="switchPeriod('${p}')" title="Clic para ver · Doble clic para renombrar" ondblclick="renamePeriod('${p}')">${p}</div>`});
   document.getElementById('ltabs').innerHTML=ph;
   // Local tabs
   buildLocalTabs();
@@ -2490,16 +2489,6 @@ function buildLocalTabs(){
   document.getElementById('local-tabs').innerHTML=lh;
 }
 
-function deletePeriod(name){
-  if(!confirm('¿Eliminar el período "'+name+'"? Esta acción no se puede deshacer.'))return;
-  delete appData.periods[name];
-  const idx=appData.periodOrder.indexOf(name);
-  if(idx>=0)appData.periodOrder.splice(idx,1);
-  if(curPeriod===name){
-    curPeriod=appData.periodOrder[appData.periodOrder.length-1]||Object.keys(appData.periods)[0]||'';
-  }
-  showDash();
-}
 function renamePeriod(oldName){
   const newName=prompt('Renombrar período:',oldName);
   if(!newName||newName===oldName)return;
